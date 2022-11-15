@@ -1,0 +1,6 @@
+module.exports.USER_STATUS = {
+  ACTIVE: 'ACTIVE',
+  IN_ACTIVE: 'IN_ACTIVE',
+  BLOCK: 'BLOCK',
+  DELETE: 'DELETE',
+};

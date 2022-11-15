@@ -9,14 +9,14 @@ const _verify = require('../verify/verify.model');
 const _verify_type = require('../verify-type/verify-type.model');
 
 function initModels(sequelize) {
-  const group = _group(sequelize, DataTypes);
-  const group_user = _group_user(sequelize, DataTypes);
+  const verify_type = _verify_type(sequelize, DataTypes);
   const group_user_role = _group_user_role(sequelize, DataTypes);
   const role = _role(sequelize, DataTypes);
-  const user = _user(sequelize, DataTypes);
   const user_status = _user_status(sequelize, DataTypes);
+  const group = _group(sequelize, DataTypes);
+  const user = _user(sequelize, DataTypes);
   const verify = _verify(sequelize, DataTypes);
-  const verify_type = _verify_type(sequelize, DataTypes);
+  const group_user = _group_user(sequelize, DataTypes);
 
   group.belongsToMany(user, {
     as: 'user_id_users',

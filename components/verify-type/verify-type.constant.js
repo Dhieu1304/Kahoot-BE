@@ -1,0 +1,4 @@
+module.exports.VERIFY_TYPE = {
+  RESET_PASSWORD: 'RESET_PASSWORD',
+  VERIFY_MAIL: 'VERIFY_MAIL',
+};

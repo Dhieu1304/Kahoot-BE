@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const pick = require('../utils/pick');
 
-const validate = schema => (req, res, next) => {
+const validate = (schema) => (req, res, next) => {
   const validSchema = pick(schema, ['params', 'query', 'body']);
   const object = pick(req, Object.keys(validSchema));
   const { value, error } = Joi.compile(validSchema)
@@ -9,7 +9,7 @@ const validate = schema => (req, res, next) => {
     .validate(object);
 
   if (error) {
-    const errorMessage = error.details.map(details => details.message).join(', ');
+    const errorMessage = error.details.map((details) => details.message).join(', ');
     return res.status(400).json({ status: false, message: errorMessage });
   }
   Object.assign(req, value);

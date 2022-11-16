@@ -1,15 +1,15 @@
 const { ROLE } = require('../role/role.constant');
 const Joi = require('joi');
 
-// prevent create admin account
-delete ROLE.ADMIN;
+// prevent admin role
+const userRole = Object.values(ROLE).pop();
 
 module.exports.registerValidate = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
     name: Joi.string().required(),
-    role: Joi.string().valid(...Object.values(ROLE)),
+    role: Joi.string().valid(...userRole),
   }),
 };
 

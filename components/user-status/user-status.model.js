@@ -19,7 +19,7 @@ module.exports = function (sequelize, DataTypes) {
       sequelize,
       tableName: 'user_status',
       schema: 'public',
-      timestamps: false,
+      timestamps: true,
       indexes: [
         {
           name: 'user_status_name_key',

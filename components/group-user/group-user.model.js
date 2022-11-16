@@ -34,7 +34,7 @@ module.exports = function (sequelize, DataTypes) {
       sequelize,
       tableName: 'group_user',
       schema: 'public',
-      timestamps: false,
+      timestamps: true,
       indexes: [
         {
           name: 'group_user_pkey',

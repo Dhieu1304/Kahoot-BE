@@ -1,11 +1,7 @@
 const initModels = require('./init-models');
 const db = require('../../config/database.config');
 const models = initModels(db);
-const { ROLE } = require('../role/role.constant');
-const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
-const { USER_STATUS } = require('../user-status/user-status.constant');
-const { VERIFY_TYPE } = require('../verify-type/verify-type.constant');
-const { sleep } = require('../utils/sleep');
+/*
 
 (async () => {
   try {
@@ -35,11 +31,11 @@ const { sleep } = require('../utils/sleep');
     }
 
     // init user status
-    const userStatus = await models.user_status.findAll();
+    let userStatus = await models.user_status.findAll();
     if (userStatus.length === 0) {
       console.log('Init user status data');
       const data = createDataFromObject(USER_STATUS);
-      await models.user_status.bulkCreate(data);
+      userStatus = await models.user_status.bulkCreate(data);
     }
 
     // init verify type
@@ -49,9 +45,28 @@ const { sleep } = require('../utils/sleep');
       const data = createDataFromObject(VERIFY_TYPE);
       await models.verify_type.bulkCreate(data);
     }
+
+    // init admin account
+    const adminAccount = await models.user.findOne({ where: { email: 'admin@gmail.com' } });
+    if (!adminAccount) {
+      console.log('Init admin account');
+      const adminStatus = await userStatusService.findOneUserStatusByName(USER_STATUS.ACTIVE);
+      const adminRole = await roleService.findOneRoleByName(ROLE.ADMIN);
+      const password = await authService.hashPassword('admin');
+      const admin = {
+        email: 'admin@gmail.com',
+        password,
+        uid: uuidv4(),
+        status_id: adminStatus.id,
+        role_id: adminRole.id,
+      };
+      console.log(admin);
+      await models.user.create(admin);
+    }
   } catch (e) {
     console.error(e.message);
   }
 })();
+*/
 
 module.exports = models;

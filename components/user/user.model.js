@@ -9,17 +9,18 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: false,
         primaryKey: true,
       },
-      username: {
+      email: {
         type: DataTypes.STRING(50),
         allowNull: false,
+        unique: true,
       },
       password: {
         type: DataTypes.STRING(400),
-        allowNull: false,
+        allowNull: true,
       },
       full_name: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
       },
       avatar: {
         type: DataTypes.STRING(150),
@@ -31,7 +32,7 @@ module.exports = function (sequelize, DataTypes) {
       },
       status_id: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
           model: 'user_status',
           key: 'id',
@@ -39,7 +40,7 @@ module.exports = function (sequelize, DataTypes) {
       },
       role_id: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
           model: 'role',
           key: 'id',
@@ -54,7 +55,7 @@ module.exports = function (sequelize, DataTypes) {
       sequelize,
       tableName: 'user',
       schema: 'public',
-      timestamps: false,
+      timestamps: true,
       indexes: [
         {
           name: 'user_pkey',

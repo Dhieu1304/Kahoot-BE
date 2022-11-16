@@ -19,7 +19,7 @@ module.exports = function (sequelize, DataTypes) {
       sequelize,
       tableName: 'group_user_role',
       schema: 'public',
-      timestamps: false,
+      timestamps: true,
       indexes: [
         {
           name: 'group_user_role_name_key',

@@ -2,11 +2,11 @@ const bcrypt = require('bcryptjs');
 const userService = require('../user/user.service');
 const jwt = require('jsonwebtoken');
 
-module.exports.register = async user => {
+module.exports.register = async (user) => {
   return await userService.createUser(user);
 };
 
-module.exports.hashPassword = async password => {
+module.exports.hashPassword = async (password) => {
   try {
     return await bcrypt.hash(password, 10);
   } catch (e) {
@@ -35,7 +35,7 @@ module.exports.generateToken = async (email, role) => {
   }
 };
 
-module.exports.verifyToken = async token => {
+module.exports.verifyToken = async (token) => {
   try {
     return jwt.verify(token, process.env.SECRET_KEY);
   } catch (e) {

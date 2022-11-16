@@ -15,22 +15,22 @@ module.exports = function (sequelize, DataTypes) {
       },
       member_can_share_content: {
         type: DataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: true,
       },
       member_can_share_assign_to_group: {
         type: DataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: true,
       },
       member_can_invite_new_people: {
         type: DataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: true,
       },
       member_can_see_other: {
         type: DataTypes.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
         defaultValue: true,
       },
     },
@@ -38,7 +38,7 @@ module.exports = function (sequelize, DataTypes) {
       sequelize,
       tableName: 'group',
       schema: 'public',
-      timestamps: false,
+      timestamps: true,
       indexes: [
         {
           name: 'group_pkey',

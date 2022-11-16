@@ -26,9 +26,13 @@ module.exports.comparePassword = async (password, hashPassword) => {
 
 module.exports.generateToken = async (email, role) => {
   try {
-    return jwt.sign({ email, role }, process.env.SECRET_KEY, {
-      expiresIn: process.env.TIME_EXPIRE,
+    const accessToken = jwt.sign({ email, role }, process.env.SECRET_KEY, {
+      expiresIn: process.env.TIME_EXPIRE_ACCESS,
     });
+    const refreshToken = jwt.sign({ email, role }, process.env.SECRET_KEY, {
+      expiresIn: process.env.TIME_EXPIRE_REFRESH,
+    });
+    return { accessToken, refreshToken };
   } catch (e) {
     console.log(e.message);
     return { status: false, message: 'Error generate token' };

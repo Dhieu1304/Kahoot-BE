@@ -2,7 +2,8 @@ const { ROLE } = require('../role/role.constant');
 const Joi = require('joi');
 
 // prevent admin role
-const userRole = Object.values(ROLE).pop();
+const userRole = Object.values(ROLE);
+userRole.pop();
 
 module.exports.registerValidate = {
   body: Joi.object().keys({

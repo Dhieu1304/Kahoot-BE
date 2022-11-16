@@ -47,7 +47,7 @@ module.exports = function (sequelize, DataTypes) {
         },
       },
       refresh_token: {
-        type: DataTypes.STRING(200),
+        type: DataTypes.STRING(2000),
         allowNull: true,
       },
     },

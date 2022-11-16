@@ -7,7 +7,7 @@ const { sleep } = require('../utils/sleep');
 
 (async () => {
   try {
-    await sleep(5000);
+    await sleep(3000);
     const data = await findOneByEmail('admin@gmail.com');
     if (!data) {
       console.log('init admin account');
@@ -31,7 +31,7 @@ const { sleep } = require('../utils/sleep');
 const createUser = async (user) => {
   try {
     const data = await models.user.create(user);
-    return { status: true, data, message: 'Successfully' };
+    return { status: true, data, message: 'Create Successful' };
   } catch (e) {
     console.error(e.message);
     return { status: false, message: e.message };
@@ -47,7 +47,28 @@ const findOneByEmail = async (email) => {
   }
 };
 
+const findOneDetailByEmail = async (email) => {
+  try {
+    return await models.user.findOne({ where: { email: email }, include: ['status', 'role'] });
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
+  }
+};
+
+const updateUserByEmail = async (email, updateObject) => {
+  try {
+    console.log(updateObject);
+    return await models.user.update(updateObject, { where: { email: email } });
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
+  }
+};
+
 module.exports = {
   createUser,
   findOneByEmail,
+  findOneDetailByEmail,
+  updateUserByEmail,
 };

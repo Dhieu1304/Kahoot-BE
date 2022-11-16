@@ -20,3 +20,9 @@ module.exports.loginValidate = {
     password: Joi.string().required(),
   }),
 };
+
+module.exports.verifyEmailValidate = {
+  query: Joi.object().keys({
+    token: Joi.string().required(),
+  }),
+};

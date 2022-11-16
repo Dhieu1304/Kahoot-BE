@@ -4,3 +4,6 @@ module.exports.verifyTypeService = require('./verify-type/verify-type.service');
 module.exports.userStatusService = require('./user-status/user-status.service');
 module.exports.groupUserRoleService = require('./group-user-role/group-user-role.service');
 module.exports.roleService = require('./role/role.service');
+module.exports.mailService = require('./mail/mail.service');
+module.exports.cryptoService = require('./crypto/crypto.service');
+module.exports.verifyService = require('./verify/verify.service');

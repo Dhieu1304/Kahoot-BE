@@ -30,7 +30,7 @@ module.exports = function (sequelize, DataTypes) {
       sequelize,
       tableName: 'verify',
       schema: 'public',
-      timestamps: false,
+      timestamps: true,
       indexes: [
         {
           name: 'verify_pkey',

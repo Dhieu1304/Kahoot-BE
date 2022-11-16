@@ -19,7 +19,7 @@ module.exports = function (sequelize, DataTypes) {
       sequelize,
       tableName: 'verify_type',
       schema: 'public',
-      timestamps: false,
+      timestamps: true,
       indexes: [
         {
           name: 'verify_type_name_key',

@@ -24,3 +24,11 @@ module.exports.findAllVerifyType = async () => {
     console.error(e.message);
   }
 };
+
+module.exports.findOneVerifyTypeByName = async (name) => {
+  try {
+    return await models.verify_type.findOne({ where: { name: name } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};

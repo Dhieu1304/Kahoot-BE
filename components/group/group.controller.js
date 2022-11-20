@@ -14,7 +14,7 @@ const getGroupsByOwnUserId = async (req, res) => {
   return res.status(200).json({ status: true, data: groups });
 };
 
-const getGroupsByTakePartInUserId = async (req, res) => {
+const getGroupsByJoinedUserId = async (req, res) => {
   const user_id_str = req.params.user_id;
   const user_id = parseInt(user_id_str) || -1;
   const groups = await groupService.getGroupsByUserIds({ user_id, role_id: [2, 3] });
@@ -46,6 +46,6 @@ const createGroup = async (req, res) => {
 module.exports = {
   getGroupsByUserId,
   getGroupsByOwnUserId,
-  getGroupsByTakePartInUserId,
+  getGroupsByJoinedUserId,
   createGroup,
 };

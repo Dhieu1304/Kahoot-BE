@@ -7,3 +7,4 @@ module.exports.roleService = require('./role/role.service');
 module.exports.mailService = require('./mail/mail.service');
 module.exports.cryptoService = require('./crypto/crypto.service');
 module.exports.verifyService = require('./verify/verify.service');
+module.exports.groupUserService = require('./group-user/group-user.service');

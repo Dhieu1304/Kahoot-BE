@@ -3,10 +3,10 @@ const userService = require('../user/user.service');
 const { roleService, userStatusService, cryptoService, verifyService, mailService } = require('../service.init');
 const { USER_STATUS } = require('../user-status/user-status.constant');
 const { v4: uuidv4 } = require('uuid');
-const { VERIFY_TYPE } = require('../verify-type/verify-type.constant');
+const { ROLE } = require('../role/role.constant');
 
 module.exports.register = async (req, res) => {
-  const { email, password, name, role } = req.body;
+  const { email, password, name, avatar } = req.body;
   const exitsUser = await userService.findOneByEmail(email);
   if (exitsUser) {
     return res.status(400).json({
@@ -14,7 +14,7 @@ module.exports.register = async (req, res) => {
       message: `${email} already used, please try another email`,
     });
   }
-  const roleId = await roleService.findOneRoleByName(role);
+  const roleId = await roleService.findOneRoleByName(ROLE.USER);
   const statusId = await userStatusService.findOneUserStatusByName(USER_STATUS.IN_ACTIVE);
   const hashPassword = await authService.hashPassword(password);
   const uid = uuidv4();
@@ -25,13 +25,43 @@ module.exports.register = async (req, res) => {
     role_id: roleId.id,
     status_id: statusId.id,
     uid,
+    avatar,
   };
   const data = await userService.createUser(user);
   const status = data.status ? 200 : 400 || 500;
   res.status(status).json(data);
   if (data.status) {
-    await authService.sendMaleVerify(data.data.id, email, name, role);
+    await authService.sendMaleVerify(data.data.id, email, name);
   }
+};
+
+module.exports.googleAuth = async (req, res) => {
+  const { email, name, avatar } = req.body;
+  let user = await userService.findOneByEmail(email);
+  if (!user) {
+    const roleId = await roleService.findOneRoleByName(ROLE.USER);
+    const statusId = await userStatusService.findOneUserStatusByName(USER_STATUS.ACTIVE);
+    const uid = uuidv4();
+    const newUser = {
+      email,
+      password: 'firebase-google-sign-in',
+      full_name: name,
+      role_id: roleId.id,
+      status_id: statusId.id,
+      uid,
+      avatar,
+    };
+    user = await userService.createUser(newUser);
+  }
+  const payload = {
+    id: user.id,
+    email: user.email,
+    role: user.role_id,
+  };
+  const accessToken = await authService.generateToken(payload, +process.env.TIME_EXPIRE_ACCESS);
+  const refreshToken = await authService.generateToken(payload, process.env.TIME_EXPIRE_REFRESH);
+  await userService.updateUserByEmail(email, { refresh_token: refreshToken });
+  return res.status(200).json({ status: true, data: { accessToken, refreshToken } });
 };
 
 module.exports.login = async (req, res) => {
@@ -49,9 +79,15 @@ module.exports.login = async (req, res) => {
   } else if (existsUser.status.name === USER_STATUS.BLOCK) {
     return res.status(400).json({ status: false, message: `Your account has been blocked` });
   }
-  const token = await authService.generateToken(existsUser.id, existsUser.email, existsUser.role);
-  await userService.updateUserByEmail(email, { refresh_token: token.refreshToken });
-  return res.status(200).json({ status: true, data: token });
+  const payload = {
+    id: existsUser.id,
+    email: existsUser.email,
+    role: existsUser.role.id,
+  };
+  const accessToken = await authService.generateToken(payload, +process.env.TIME_EXPIRE_ACCESS);
+  const refreshToken = await authService.generateToken(payload, process.env.TIME_EXPIRE_REFRESH);
+  await userService.updateUserByEmail(email, { refresh_token: refreshToken });
+  return res.status(200).json({ status: true, data: { accessToken, refreshToken } });
 };
 
 module.exports.reSendVerifyEmail = async (req, res) => {
@@ -64,16 +100,30 @@ module.exports.verifyEmail = async (req, res) => {
   try {
     const token = req.query.token.replaceAll(' ', '+');
     const data = cryptoService.decryptData(token);
-    console.log(data);
     const verifyData = await verifyService.findOneVerifyByUserIdAndType(data.id, data.type);
     if (data.code === verifyData.code) {
       const statusId = await userStatusService.findOneUserStatusByName(USER_STATUS.ACTIVE);
-      const data1 = await userService.updateUserByEmail(data.email, { status_id: statusId.id });
-      console.log(data1);
+      const updateUser = await userService.updateUserByEmail(data.email, { status_id: statusId.id });
       return res.status(200).json({ status: true, message: 'Successful' });
     }
     return res.status(400).json({ status: false, message: 'Invalid Code' });
   } catch (e) {
     console.error(e.message);
   }
+};
+
+module.exports.refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+  const user = await userService.findOneByRefreshToken(refreshToken);
+  const decoded = await authService.verifyToken(refreshToken);
+  if (user && decoded) {
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.role_id,
+    };
+    const token = await authService.generateToken(payload, +process.env.TIME_EXPIRE_ACCESS);
+    return res.status(200).json({ status: true, data: { accessToken: token } });
+  }
+  return res.status(400).json({ status: false, message: 'BAD_REQUEST' });
 };

@@ -128,7 +128,7 @@ module.exports.forgotPassword = (fullName, link) => {
     </html>`;
 };
 
-const verifyEmail = (fullName, role, link) => {
+const verifyEmail = (fullName, link) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -200,7 +200,7 @@ const verifyEmail = (fullName, role, link) => {
             </div>
             <div>
                 <div>
-                    Welcome to Kahoot_HCMUS! From now on, you become a member with the role of ${role}. We send you a password to log in to the system, absolutely do not share this password with anyone.
+                    Welcome to Kahoot_HCMUS! From now on, you become a member of our system.
                 </div>
                 <div>
                     Please click below button to verify your account before login.
@@ -224,11 +224,11 @@ const verifyEmail = (fullName, role, link) => {
     </html>`;
 };
 
-module.exports.sendVerifyEmail = async (email, name, role, token) => {
+module.exports.sendVerifyEmail = async (email, name, token) => {
   try {
     const urlApp = process.env.NODE_ENV === 'PRODUCTION' ? process.env.REACT_URL_APP : `http://localhost:3043`;
     const link = `${urlApp}/auth/verify-email?token=${token}`;
-    const content = verifyEmail(name, role, link);
+    const content = verifyEmail(name, link);
     const result = await sendEmail(email, 'Welcome to Kahoot_HCMUS', content);
     return !!result;
   } catch (e) {

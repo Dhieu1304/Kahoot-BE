@@ -47,6 +47,20 @@ const findOneByEmail = async (email) => {
   }
 };
 
+const getInfoByEmail = async (email) => {
+  try {
+    const user = await models.user.findOne({ where: { email: email }, raw: true });
+    delete user.password;
+    delete user.refresh_token;
+    delete user.uid;
+    delete user.createdAt;
+    delete user.updatedAt;
+    return user;
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 const findOneDetailByEmail = async (email) => {
   try {
     return await models.user.findOne({ where: { email: email }, include: ['status', 'role'] });
@@ -58,8 +72,16 @@ const findOneDetailByEmail = async (email) => {
 
 const updateUserByEmail = async (email, updateObject) => {
   try {
-    console.log(updateObject);
     return await models.user.update(updateObject, { where: { email: email } });
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
+  }
+};
+
+const findOneByRefreshToken = async (refreshToken) => {
+  try {
+    return await models.user.findOne({ where: { refresh_token: refreshToken }, raw: true });
   } catch (e) {
     console.error(e.message);
     return { status: false, message: e.message };
@@ -71,4 +93,6 @@ module.exports = {
   findOneByEmail,
   findOneDetailByEmail,
   updateUserByEmail,
+  getInfoByEmail,
+  findOneByRefreshToken,
 };

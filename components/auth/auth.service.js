@@ -27,17 +27,13 @@ module.exports.comparePassword = async (password, hashPassword) => {
   }
 };
 
-module.exports.generateToken = async (id, email, role) => {
+module.exports.generateToken = async (payload, expTime) => {
   try {
-    const accessToken = jwt.sign({ id, email, role }, process.env.SECRET_KEY, {
-      expiresIn: process.env.TIME_EXPIRE_ACCESS,
+    return jwt.sign(payload, process.env.SECRET_KEY, {
+      expiresIn: expTime, //process.env.TIME_EXPIRE_ACCESS,
     });
-    const refreshToken = jwt.sign({ id, email, role }, process.env.SECRET_KEY, {
-      expiresIn: process.env.TIME_EXPIRE_REFRESH,
-    });
-    return { accessToken, refreshToken };
   } catch (e) {
-    console.log(e.message);
+    console.error(e.message);
     return { status: false, message: 'Error generate token' };
   }
 };
@@ -51,7 +47,7 @@ module.exports.verifyToken = async (token) => {
   }
 };
 
-module.exports.sendMaleVerify = async (userId, email, name, role) => {
+module.exports.sendMaleVerify = async (userId, email, name) => {
   try {
     const code = randomString(6);
     const token = cryptoService.encryptData({
@@ -61,7 +57,7 @@ module.exports.sendMaleVerify = async (userId, email, name, role) => {
       type: VERIFY_TYPE.VERIFY_MAIL,
       date: new Date().getTime(),
     });
-    const sendMail = await mailService.sendVerifyEmail(email, name, role, token);
+    const sendMail = await mailService.sendVerifyEmail(email, name, token);
     if (sendMail) {
       await verifyService.createNewVerify(userId, VERIFY_TYPE.VERIFY_MAIL, code);
     }

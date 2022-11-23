@@ -10,5 +10,7 @@ router.post('/login', validate(authValidation.loginValidate), authController.log
 router.post('/resend-verify-email', jwtAuth, authController.reSendVerifyEmail);
 router.post('/resend-verify-email', jwtAuth, authController.reSendVerifyEmail);
 router.get('/verify-email', validate(authValidation.verifyEmailValidate), authController.verifyEmail);
+router.post('/refresh-token', validate(authValidation.refreshToken), authController.refreshToken);
+router.post('/google-sign-in', validate(authValidation.googleAuth), authController.googleAuth);
 
 module.exports = router;

@@ -1,5 +1,4 @@
 module.exports.ROLE = {
-  TEACHER: 'TEACHER',
-  STUDENT: 'STUDENT',
+  USER: 'USER',
   ADMIN: 'ADMIN',
 };

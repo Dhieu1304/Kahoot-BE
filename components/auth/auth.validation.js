@@ -1,16 +1,19 @@
-const { ROLE } = require('../role/role.constant');
 const Joi = require('joi');
-
-// prevent admin role
-const userRole = Object.values(ROLE);
-userRole.pop();
 
 module.exports.registerValidate = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
     name: Joi.string().required(),
-    role: Joi.string().valid(...userRole),
+    avatar: Joi.string(),
+  }),
+};
+
+module.exports.googleAuth = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    name: Joi.string().required(),
+    avatar: Joi.string(),
   }),
 };
 
@@ -24,5 +27,11 @@ module.exports.loginValidate = {
 module.exports.verifyEmailValidate = {
   query: Joi.object().keys({
     token: Joi.string().required(),
+  }),
+};
+
+module.exports.refreshToken = {
+  body: Joi.object().keys({
+    refreshToken: Joi.string().required(),
   }),
 };

@@ -13,7 +13,7 @@ module.exports.jwtAuth = async function (req, res, next) {
     else return res.status(401).json({ status: false, message: `Invalid token.` });
     next();
   } catch (e) {
-    console.log(e.message);
+    console.error(e.message);
     return res.status(400).json({
       status: false,
       message: 'Internal error server',

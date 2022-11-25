@@ -43,12 +43,10 @@ const getGroupsByUserIds = async ({ user_id, role_id, raw = false }) => {
             {
               model: models.user,
               as: 'user',
-              attributes: [],
             },
             {
               model: models.group_user_role,
               as: 'group_user_role',
-              attributes: [],
             },
           ],
         },
@@ -136,7 +134,39 @@ const createGroup = async ({
   }
 };
 
+const inviteByEmail = async ({ id, email }) => {
+  try {
+    //
+    return { status: true, data, message: 'Invite Successful' };
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
+  }
+};
+
+const checkOwnedUser = async ({ group_id, user_id }) => {
+  user_id = parseInt(user_id);
+  group_id = parseInt(group_id);
+  try {
+    const result = await models.group_user.findAll({
+      where: {
+        group_id,
+        user_id,
+        group_user_role_id: 1,
+      },
+    });
+
+    if (result.length > 0) return true;
+    else return false;
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
+  }
+};
+
 module.exports = {
   getGroupsByUserIds,
   createGroup,
+  inviteByEmail,
+  checkOwnedUser,
 };

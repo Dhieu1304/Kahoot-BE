@@ -88,6 +88,40 @@ const findOneByRefreshToken = async (refreshToken) => {
   }
 };
 
+const getUsersByGroupId = async ({ group_id, raw = false }) => {
+  try {
+    group_id = parseInt(group_id) || -1;
+
+    const users = await models.user.findAll({
+      raw: raw,
+      include: [
+        {
+          model: models.group_user,
+          as: 'group_users',
+          where: {
+            group_id: group_id,
+          },
+          include: [
+            {
+              model: models.group_user_role,
+              as: 'group_user_role',
+            },
+          ],
+        },
+        {
+          model: models.user_status,
+          as: 'status',
+        },
+      ],
+    });
+
+    return users;
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
+  }
+};
+
 module.exports = {
   createUser,
   findOneByEmail,
@@ -95,4 +129,5 @@ module.exports = {
   updateUserByEmail,
   getInfoByEmail,
   findOneByRefreshToken,
+  getUsersByGroupId,
 };

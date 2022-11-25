@@ -11,9 +11,7 @@ module.exports.registerValidate = {
 
 module.exports.googleAuth = {
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    name: Joi.string().required(),
-    avatar: Joi.string(),
+    idToken: Joi.string().required(),
   }),
 };
 

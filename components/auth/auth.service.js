@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { randomString } = require('../utils/random-string');
 const { mailService, verifyService, cryptoService } = require('../service.init');
 const { VERIFY_TYPE } = require('../verify-type/verify-type.constant');
+const { getAuth } = require('firebase-admin/auth');
 
 module.exports.register = async (user) => {
   return await userService.createUser(user);
@@ -63,5 +64,16 @@ module.exports.sendMaleVerify = async (userId, email, name) => {
     }
   } catch (e) {
     console.error(e.message);
+  }
+};
+
+module.exports.verifyIdTokenFirebase = async (idToken) => {
+  try {
+    const data = await getAuth().verifyIdToken(idToken);
+    console.log(data);
+    return { status: true, data };
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
   }
 };

@@ -5,6 +5,7 @@ const logger = require('morgan');
 const { initRouter } = require('./components/route.init');
 const cors = require('cors');
 require('dotenv').config();
+require('./config/firebaseAdmin.config');
 
 const app = express();
 

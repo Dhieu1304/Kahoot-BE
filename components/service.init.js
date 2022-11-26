@@ -1,3 +1,4 @@
+require('./mockup-data');
 module.exports.authService = require('./auth/auth.service');
 module.exports.userService = require('./user/user.service');
 module.exports.verifyTypeService = require('./verify-type/verify-type.service');

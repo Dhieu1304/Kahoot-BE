@@ -36,32 +36,42 @@ module.exports.register = async (req, res) => {
 };
 
 module.exports.googleAuth = async (req, res) => {
-  const { email, name, avatar } = req.body;
-  let user = await userService.findOneByEmail(email);
-  if (!user) {
-    const roleId = await roleService.findOneRoleByName(ROLE.USER);
-    const statusId = await userStatusService.findOneUserStatusByName(USER_STATUS.ACTIVE);
-    const uid = uuidv4();
-    const newUser = {
-      email,
-      password: 'firebase-google-sign-in',
-      full_name: name,
-      role_id: roleId.id,
-      status_id: statusId.id,
-      uid,
-      avatar,
+  const { idToken } = req.body;
+  const verifyToken = await authService.verifyIdTokenFirebase(idToken);
+  if (verifyToken && verifyToken.status) {
+    const { data } = verifyToken;
+    let user = await userService.findOneByEmail(data.email);
+    if (!user) {
+      const roleId = await roleService.findOneRoleByName(ROLE.USER);
+      let statusId;
+      if (data.email_verified) {
+        statusId = await userStatusService.findOneUserStatusByName(USER_STATUS.ACTIVE);
+      } else {
+        statusId = await userStatusService.findOneUserStatusByName(USER_STATUS.IN_ACTIVE);
+      }
+      const uid = uuidv4();
+      const newUser = {
+        email: data.email,
+        password: 'firebase-google-sign-in',
+        full_name: data.name,
+        role_id: roleId.id,
+        status_id: statusId.id,
+        uid,
+        avatar: data.picture,
+      };
+      user = await userService.createUser(newUser);
+    }
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.role_id,
     };
-    user = await userService.createUser(newUser);
+    const accessToken = await authService.generateToken(payload, +process.env.TIME_EXPIRE_ACCESS);
+    const refreshToken = await authService.generateToken(payload, process.env.TIME_EXPIRE_REFRESH);
+    await userService.updateUserByEmail(data.email, { refresh_token: refreshToken });
+    return res.status(200).json({ status: true, data: { accessToken, refreshToken } });
   }
-  const payload = {
-    id: user.id,
-    email: user.email,
-    role: user.role_id,
-  };
-  const accessToken = await authService.generateToken(payload, +process.env.TIME_EXPIRE_ACCESS);
-  const refreshToken = await authService.generateToken(payload, process.env.TIME_EXPIRE_REFRESH);
-  await userService.updateUserByEmail(email, { refresh_token: refreshToken });
-  return res.status(200).json({ status: true, data: { accessToken, refreshToken } });
+  return res.status(400).json(verifyToken);
 };
 
 module.exports.login = async (req, res) => {

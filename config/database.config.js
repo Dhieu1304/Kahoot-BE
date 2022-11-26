@@ -27,10 +27,4 @@ const sequelizeHeroku = new Sequelize(process.env.HDB_DATABASE, process.env.HDB_
 
 const db = process.env.NODE_ENV === 'PRODUCTION' ? sequelizeHeroku : sequelizeLocal;
 
-if (process.env.DB_SYNC === '1') {
-  db.sync({ force: true }).then(() => {
-    console.log('Drop and re-sync db.');
-  });
-}
-
 module.exports = db;

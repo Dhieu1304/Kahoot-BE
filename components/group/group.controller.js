@@ -1,4 +1,6 @@
 const groupService = require('./group.service');
+const { cryptoService, groupUserRoleService, groupUserService } = require('../service.init');
+const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 
 const getGroupsByUserId = async (req, res) => {
   const user_id_str = req.params.user_id;
@@ -65,6 +67,38 @@ const checkOwnedUser = async (req, res) => {
   return res.status(200).json({ status: true, data: result });
 };
 
+const joinGroupByLink = async (req, res) => {
+  const token = req.query.token.replaceAll(' ', '+');
+  const decryptData = await cryptoService.decryptData(token);
+  if (decryptData) {
+    if (decryptData.expired < new Date().getTime()) {
+      return res.status(400).json({ status: false, message: 'Expired link' });
+    }
+    const groupUserRole = await groupUserRoleService.findOneByName(GROUP_USER_ROLE.MEMBER);
+    const data = await groupUserService.createGroupUser(req.user.id, +decryptData.groupId, groupUserRole.id);
+    return res.status(200).json({ status: true, message: 'Successful', data: data.data });
+  }
+  return res.status(400).json({ status: false, message: 'Invalid invite link' });
+};
+
+const createInviteLink = async (req, res) => {
+  const { groupId } = req.query;
+  const checkGroup = await groupService.findOneById(groupId);
+  if (!checkGroup) {
+    return res.status(400).json({ status: false, message: 'Invalid group' });
+  }
+  let url = process.env.NODE_ENV === 'PRODUCTION' ? process.env.BE_URL : `http://localhost:${process.env.PORT}`;
+  const encryptData = {
+    groupId,
+    expired: new Date().getTime() + 60 * 60 * 1000,
+  };
+  const token = await cryptoService.encryptData(encryptData);
+  const data = {
+    link: `${url}/group/join-by-link?token=${token}`,
+  };
+  return res.status(200).json({ status: true, message: 'Successful', data });
+};
+
 module.exports = {
   getGroupsByUserId,
   getGroupsByOwnUserId,
@@ -72,4 +106,6 @@ module.exports = {
   createGroup,
   inviteByEmail,
   checkOwnedUser,
+  joinGroupByLink,
+  createInviteLink,
 };

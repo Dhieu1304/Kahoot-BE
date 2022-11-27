@@ -1,6 +1,6 @@
 const models = require('../models');
 
-const createGroupUser = async ({ user_id, group_id, group_user_role_id }) => {
+const createGroupUser = async (user_id, group_id, group_user_role_id) => {
   try {
     const groupUser = {
       user_id,

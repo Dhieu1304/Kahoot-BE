@@ -124,8 +124,7 @@ const createGroup = async ({
 
     user_id = parseInt(user_id);
 
-    const groupUser =
-      group_id && user_id && (await groupUserService.createGroupUser({ user_id, group_id, group_user_role_id: 1 }));
+    const groupUser = group_id && user_id && (await groupUserService.createGroupUser(user_id, group_id, 1));
 
     return { status: true, data, message: 'Create Successful' };
   } catch (e) {
@@ -164,9 +163,18 @@ const checkOwnedUser = async ({ group_id, user_id }) => {
   }
 };
 
+const findOneById = async (groupId) => {
+  try {
+    return await models.group.findOne({ where: { id: groupId } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   getGroupsByUserIds,
   createGroup,
   inviteByEmail,
   checkOwnedUser,
+  findOneById,
 };

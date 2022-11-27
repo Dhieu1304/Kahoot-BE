@@ -226,7 +226,8 @@ const verifyEmail = (fullName, link) => {
 
 module.exports.sendVerifyEmail = async (email, name, token) => {
   try {
-    const urlApp = process.env.NODE_ENV === 'PRODUCTION' ? process.env.REACT_URL_APP : `http://localhost:3043`;
+    const urlApp =
+      process.env.NODE_ENV === 'PRODUCTION' ? process.env.REACT_URL_APP : `http://localhost:${process.env.PORT}`;
     const link = `${urlApp}/auth/verify-email?token=${token}`;
     const content = verifyEmail(name, link);
     const result = await sendEmail(email, 'Welcome to Kahoot_HCMUS', content);

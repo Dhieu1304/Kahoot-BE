@@ -171,10 +171,19 @@ const findOneById = async (groupId) => {
   }
 };
 
+const sendMailInvite = async (groupId) => {
+  try {
+    return await models.group.findOne({ where: { id: groupId } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   getGroupsByUserIds,
   createGroup,
   inviteByEmail,
   checkOwnedUser,
   findOneById,
+  sendMailInvite,
 };

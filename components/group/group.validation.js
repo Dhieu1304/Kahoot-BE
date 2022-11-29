@@ -12,7 +12,15 @@ const createInviteLink = {
   }),
 };
 
+const inviteUser = {
+  query: Joi.object().keys({
+    email: Joi.string().required().email(),
+    groupId: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   joinGroupByLink,
   createInviteLink,
+  inviteUser,
 };

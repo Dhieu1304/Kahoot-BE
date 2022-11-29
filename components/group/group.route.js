@@ -21,5 +21,7 @@ router.get(
   validate(groupValidation.createInviteLink),
   groupController.createInviteLink,
 );
+router.get('/invite-mail', jwtAuth, validate(groupValidation.inviteUser), groupController.inviteUserByEmail);
+router.get('/join-by-email', jwtAuth, validate(groupValidation.joinGroupByLink), groupController.joinGroupByEmail);
 
 module.exports = router;

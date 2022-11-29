@@ -1,5 +1,5 @@
 const groupService = require('./group.service');
-const { cryptoService, groupUserRoleService, groupUserService } = require('../service.init');
+const { cryptoService, groupUserRoleService, groupUserService, userService, mailService } = require('../service.init');
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 
 const getGroupsByUserId = async (req, res) => {
@@ -99,6 +99,54 @@ const createInviteLink = async (req, res) => {
   return res.status(200).json({ status: true, message: 'Successful', data });
 };
 
+const inviteUserByEmail = async (req, res) => {
+  const { email, groupId } = req.query;
+  const receiver = await userService.findOneByEmail(email);
+  if (!receiver) {
+    return res.status(400).json({ status: false, message: 'Invalid email' });
+  }
+  const checkGroup = await groupService.findOneById(groupId);
+  if (!checkGroup) {
+    return res.status(400).json({ status: false, message: 'Invalid group' });
+  }
+  const checkUserGroup = await groupUserService.findOneByUserIdAndGroupId(receiver.id, groupId);
+  if (checkUserGroup) {
+    return res.status(400).json({ status: false, message: 'This user is in the group' });
+  }
+  const sender = await userService.findOneByEmail(req.user.email);
+  const domain = process.env.NODE_ENV === 'PRODUCTION' ? process.env.BE_URL : `http://localhost:${process.env.PORT}`;
+  const encryptData = {
+    email,
+    groupId,
+    expired: new Date().getTime() + 60 * 60 * 1000,
+  };
+  const token = await cryptoService.encryptData(encryptData);
+  const data = {
+    link: `${domain}/group/join-by-email?token=${token}`,
+  };
+  const content = mailService.inviteToGroup(sender.full_name, receiver.full_name, checkGroup.name, data.link);
+  await mailService.sendEmail(email, 'Invite to group', content);
+  return res.status(200).json({ status: true, message: 'Successful' });
+};
+
+const joinGroupByEmail = async (req, res) => {
+  const token = req.query.token.replaceAll(' ', '+');
+  const decryptData = await cryptoService.decryptData(token);
+  if (decryptData) {
+    console.log('decryptData', decryptData);
+    if (decryptData.email !== req.user.email) {
+      return res.status(400).json({ status: false, message: 'This link not belong to you' });
+    }
+    if (decryptData.expired < new Date().getTime()) {
+      return res.status(400).json({ status: false, message: 'Expired link' });
+    }
+    const groupUserRole = await groupUserRoleService.findOneByName(GROUP_USER_ROLE.MEMBER);
+    const data = await groupUserService.createGroupUser(req.user.id, +decryptData.groupId, groupUserRole.id);
+    return res.status(200).json({ status: true, message: 'Successful', data: data.data });
+  }
+  return res.status(400).json({ status: false, message: 'Invalid invite link' });
+};
+
 module.exports = {
   getGroupsByUserId,
   getGroupsByOwnUserId,
@@ -108,4 +156,6 @@ module.exports = {
   checkOwnedUser,
   joinGroupByLink,
   createInviteLink,
+  inviteUserByEmail,
+  joinGroupByEmail,
 };

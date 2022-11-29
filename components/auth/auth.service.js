@@ -48,7 +48,7 @@ module.exports.verifyToken = async (token) => {
   }
 };
 
-module.exports.sendMaleVerify = async (userId, email, name) => {
+module.exports.sendMailVerify = async (userId, email, name) => {
   try {
     const code = randomString(6);
     const token = cryptoService.encryptData({

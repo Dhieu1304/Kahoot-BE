@@ -31,7 +31,7 @@ module.exports.register = async (req, res) => {
   const status = data.status ? 200 : 400 || 500;
   res.status(status).json(data);
   if (data.status) {
-    await authService.sendMaleVerify(data.data.id, email, name);
+    await authService.sendMailVerify(data.data.id, email, name);
   }
 };
 

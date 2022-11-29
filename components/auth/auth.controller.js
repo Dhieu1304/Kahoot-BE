@@ -59,7 +59,8 @@ module.exports.googleAuth = async (req, res) => {
         uid,
         avatar: data.picture,
       };
-      user = await userService.createUser(newUser);
+      const createUser = await userService.createUser(newUser);
+      user = createUser.data;
     }
     const payload = {
       id: user.id,

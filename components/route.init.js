@@ -3,6 +3,7 @@ const userRouter = require('./user/user.route');
 const groupRouter = require('./group/group.route');
 const verifyTypeRouter = require('./verify-type/verify-type.route');
 const uploadRouter = require('./upload/upload.route');
+const groupUserRouter = require('./group-user/group-user.route');
 
 module.exports.initRouter = (app) => {
   app.use('/auth', authRouter);
@@ -10,4 +11,5 @@ module.exports.initRouter = (app) => {
   app.use('/group', groupRouter);
   app.use('/verify-type', verifyTypeRouter);
   app.use('/upload', uploadRouter);
+  app.use('/group-user', groupUserRouter);
 };

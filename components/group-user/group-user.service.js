@@ -18,10 +18,22 @@ const createGroupUser = async (user_id, group_id, group_user_role_id) => {
 
 const findOneByUserIdAndGroupId = async (user_id, group_id) => {
   try {
+    console.error(user_id, group_id);
     return await models.group_user.findOne({ where: { user_id: user_id, group_id: group_id } });
   } catch (e) {
     console.error(e.message);
   }
 };
 
-module.exports = { createGroupUser, findOneByUserIdAndGroupId };
+const updateUserRoleInGroup = async (user_id, group_id, group_user_role_id) => {
+  try {
+    return await models.group_user.update(
+      { group_user_role_id: group_user_role_id },
+      { where: { user_id: user_id, group_id: group_id } },
+    );
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
+module.exports = { createGroupUser, findOneByUserIdAndGroupId, updateUserRoleInGroup };

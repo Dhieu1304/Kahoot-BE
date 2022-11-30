@@ -11,6 +11,7 @@ module.exports.info = async (req, res) => {
 
 module.exports.updateInfo = async (req, res) => {
   const { avatar, full_name } = req.body;
+  console.log({ avatar, full_name });
   const updateBody = {};
   if (avatar) updateBody.avatar = avatar;
   if (full_name) updateBody.full_name = full_name;

@@ -4,6 +4,7 @@ const uploadFile = (file, subDir) => {
   return new Promise(async (resolve, reject) => {
     try {
       console.log('firebaseBucket: ', firebase);
+      console.log('file: ', file);
       let linkFile = '';
       const name = `${new Date().getTime()}-${file.originalname.trim().toLowerCase().replaceAll(' ', '-')}`;
       const blob = firebase.bucket.file(subDir + '/' + name);

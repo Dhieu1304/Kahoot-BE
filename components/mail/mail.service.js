@@ -208,6 +208,8 @@ const verifyEmail = (fullName, link) => {
                 <div class="btn-verify">
                     <a href="${link}" target="_blank"> Click here to Verify </a>
                 </div>
+                <div>If the button above is not working, paste this link below into your browser:</div>
+                <div class="link-style">${link}</div>
                 <div>
                     Thank you.
                 </div>

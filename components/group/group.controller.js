@@ -114,7 +114,7 @@ const inviteUserByEmail = async (req, res) => {
     return res.status(400).json({ status: false, message: 'This user is in the group' });
   }
   const sender = await userService.findOneByEmail(req.user.email);
-  const domain = process.env.NODE_ENV === 'PRODUCTION' ? process.env.REACT_URL_APP : `http://localhost:3043`;
+  const domain = process.env.NODE_ENV === 'PRODUCTION' ? process.env.REACT_URL_APP : `http://localhost:5566`;
   const encryptData = {
     email,
     groupId,

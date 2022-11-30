@@ -16,4 +16,11 @@ const firebaseConfig = {
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(firebaseConfig),
   projectId: 'kahoot-5869a',
+  storageBucket: process.env.STORAGE_BUCKET,
 });
+
+const bucket = firebaseAdmin.storage().bucket();
+
+module.exports = {
+  bucket,
+};

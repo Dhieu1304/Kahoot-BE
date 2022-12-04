@@ -125,7 +125,7 @@ const inviteUserByEmail = async (req, res) => {
     link: `${domain}/group/join-by-email?token=${token}`,
   };
   const content = mailService.inviteToGroup(sender.full_name, receiver.full_name, checkGroup.name, data.link);
-  await mailService.sendEmail(email, 'Invite to group', content);
+  mailService.sendEmail(email, 'Invite to group', content);
   return res.status(200).json({ status: true, message: 'Successful' });
 };
 

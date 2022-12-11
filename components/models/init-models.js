@@ -13,6 +13,7 @@ const _presentation_member = require('../presentation-member/presentation-member
 const _slide_parent_type = require('../slide-parent-type/slide-parent-type.model');
 const _slide_type = require('../slide-type/slide-type.model');
 const _slide = require('../slide/slide.model');
+const _slide_data = require('../slide-data/slide-data.model');
 
 function initModels(sequelize) {
   const verify_type = _verify_type(sequelize, DataTypes);
@@ -29,6 +30,7 @@ function initModels(sequelize) {
   const slide_parent_type = _slide_parent_type(sequelize, DataTypes);
   const slide_type = _slide_type(sequelize, DataTypes);
   const slide = _slide(sequelize, DataTypes);
+  const slide_data = _slide_data(sequelize, DataTypes);
 
   group.belongsToMany(user, {
     as: 'user_id_users',
@@ -91,6 +93,10 @@ function initModels(sequelize) {
   slide_type.hasMany(slide, { as: 'slides', foreignKey: 'slide_type_id' });
   slide.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
   presentation.hasMany(slide, { as: 'slides', foreignKey: 'presentation_id' });
+  slide_data.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
+  presentation.hasMany(slide_data, { as: 'slide_data', foreignKey: 'presentation_id' });
+  slide_data.belongsTo(user, { as: 'user', foreignKey: 'user_id' });
+  user.hasMany(slide_data, { as: 'slide_data', foreignKey: 'user_id' });
 
   return {
     group,
@@ -107,6 +113,7 @@ function initModels(sequelize) {
     slide_parent_type,
     slide_type,
     slide,
+    slide_data,
   };
 }
 module.exports = initModels;

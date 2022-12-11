@@ -9,6 +9,7 @@ const _verify = require('../verify/verify.model');
 const _verify_type = require('../verify-type/verify-type.model');
 const _presentation_type = require('../presentation-type/presentation-type.model');
 const _presentation = require('../presentation/presentation.model');
+const _presentation_member = require('../presentation-member/presentation-member.model');
 
 function initModels(sequelize) {
   const verify_type = _verify_type(sequelize, DataTypes);
@@ -21,6 +22,7 @@ function initModels(sequelize) {
   const group_user = _group_user(sequelize, DataTypes);
   const presentation_type = _presentation_type(sequelize, DataTypes);
   const presentation = _presentation(sequelize, DataTypes);
+  const presentation_member = _presentation_member(sequelize, DataTypes);
 
   group.belongsToMany(user, {
     as: 'user_id_users',
@@ -71,6 +73,12 @@ function initModels(sequelize) {
   verify_type.hasMany(verify, { as: 'verifies', foreignKey: 'verify_type_id' });
   presentation.belongsTo(presentation_type, { as: 'presentation_type', foreignKey: 'presentation_type_id' });
   presentation_type.hasMany(presentation, { as: 'presentations', foreignKey: 'presentation_type_id' });
+  presentation_member.belongsTo(group_user_role, { as: 'role', foreignKey: 'role_id' });
+  group_user_role.hasMany(presentation_member, { as: 'presentation_members', foreignKey: 'role_id' });
+  presentation_member.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
+  presentation.hasMany(presentation_member, { as: 'presentation_members', foreignKey: 'presentation_id' });
+  presentation_member.belongsTo(user, { as: 'user', foreignKey: 'user_id' });
+  user.hasMany(presentation_member, { as: 'presentation_members', foreignKey: 'user_id' });
 
   return {
     group,
@@ -83,6 +91,7 @@ function initModels(sequelize) {
     verify_type,
     presentation,
     presentation_type,
+    presentation_member,
   };
 }
 module.exports = initModels;

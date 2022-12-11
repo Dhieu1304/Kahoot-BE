@@ -6,8 +6,8 @@ const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant
 const { ROLE } = require('../role/role.constant');
 const { USER_STATUS } = require('../user-status/user-status.constant');
 const { VERIFY_TYPE } = require('../verify-type/verify-type.constant');
-const { sleep } = require('../utils/sleep');
 const db = require('../../config/database.config');
+const { PRESENTATION_TYPE } = require('../presentation-type/presentation-type.constant');
 
 (async () => {
   if (process.env.DB_SYNC === '1') {
@@ -35,6 +35,9 @@ const db = require('../../config/database.config');
 
       data = xlsx.parse(__dirname + '/data/groupUser.xlsx');
       await models.group_user.bulkCreate(createMockData(data[0].data));
+
+      data = createMockupDataFromObject(PRESENTATION_TYPE);
+      await models.presentation_type.bulkCreate(data);
 
       console.log('-----------------------FINISHED INIT DATABASE-----------------------');
     } catch (e) {

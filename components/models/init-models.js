@@ -7,6 +7,8 @@ const _user = require('../user/user.model');
 const _user_status = require('../user-status/user-status.model');
 const _verify = require('../verify/verify.model');
 const _verify_type = require('../verify-type/verify-type.model');
+const _presentation_type = require('../presentation-type/presentation-type.model');
+const _presentation = require('../presentation/presentation.model');
 
 function initModels(sequelize) {
   const verify_type = _verify_type(sequelize, DataTypes);
@@ -17,6 +19,8 @@ function initModels(sequelize) {
   const user = _user(sequelize, DataTypes);
   const verify = _verify(sequelize, DataTypes);
   const group_user = _group_user(sequelize, DataTypes);
+  const presentation_type = _presentation_type(sequelize, DataTypes);
+  const presentation = _presentation(sequelize, DataTypes);
 
   group.belongsToMany(user, {
     as: 'user_id_users',
@@ -65,6 +69,8 @@ function initModels(sequelize) {
     foreignKey: 'verify_type_id',
   });
   verify_type.hasMany(verify, { as: 'verifies', foreignKey: 'verify_type_id' });
+  presentation.belongsTo(presentation_type, { as: 'presentation_type', foreignKey: 'presentation_type_id' });
+  presentation_type.hasMany(presentation, { as: 'presentations', foreignKey: 'presentation_type_id' });
 
   return {
     group,
@@ -75,6 +81,8 @@ function initModels(sequelize) {
     user_status,
     verify,
     verify_type,
+    presentation,
+    presentation_type,
   };
 }
 module.exports = initModels;

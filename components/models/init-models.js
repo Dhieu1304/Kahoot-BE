@@ -10,6 +10,9 @@ const _verify_type = require('../verify-type/verify-type.model');
 const _presentation_type = require('../presentation-type/presentation-type.model');
 const _presentation = require('../presentation/presentation.model');
 const _presentation_member = require('../presentation-member/presentation-member.model');
+const _slide_parent_type = require('../slide-parent-type/slide-parent-type.model');
+const _slide_type = require('../slide-type/slide-type.model');
+const _slide = require('../slide/slide.model');
 
 function initModels(sequelize) {
   const verify_type = _verify_type(sequelize, DataTypes);
@@ -23,6 +26,9 @@ function initModels(sequelize) {
   const presentation_type = _presentation_type(sequelize, DataTypes);
   const presentation = _presentation(sequelize, DataTypes);
   const presentation_member = _presentation_member(sequelize, DataTypes);
+  const slide_parent_type = _slide_parent_type(sequelize, DataTypes);
+  const slide_type = _slide_type(sequelize, DataTypes);
+  const slide = _slide(sequelize, DataTypes);
 
   group.belongsToMany(user, {
     as: 'user_id_users',
@@ -79,6 +85,12 @@ function initModels(sequelize) {
   presentation.hasMany(presentation_member, { as: 'presentation_members', foreignKey: 'presentation_id' });
   presentation_member.belongsTo(user, { as: 'user', foreignKey: 'user_id' });
   user.hasMany(presentation_member, { as: 'presentation_members', foreignKey: 'user_id' });
+  slide_type.belongsTo(slide_parent_type, { as: 'parent_type', foreignKey: 'parent_type_id' });
+  slide_parent_type.hasMany(slide_type, { as: 'slide_types', foreignKey: 'parent_type_id' });
+  slide.belongsTo(slide_type, { as: 'slide_type', foreignKey: 'slide_type_id' });
+  slide_type.hasMany(slide, { as: 'slides', foreignKey: 'slide_type_id' });
+  slide.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
+  presentation.hasMany(slide, { as: 'slides', foreignKey: 'presentation_id' });
 
   return {
     group,
@@ -92,6 +104,9 @@ function initModels(sequelize) {
     presentation,
     presentation_type,
     presentation_member,
+    slide_parent_type,
+    slide_type,
+    slide,
   };
 }
 module.exports = initModels;

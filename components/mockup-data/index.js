@@ -39,6 +39,12 @@ const { PRESENTATION_TYPE } = require('../presentation-type/presentation-type.co
       data = createMockupDataFromObject(PRESENTATION_TYPE);
       await models.presentation_type.bulkCreate(data);
 
+      data = xlsx.parse(__dirname + '/data/slideParentType.xlsx');
+      await models.slide_parent_type.bulkCreate(createMockData(data[0].data));
+
+      data = xlsx.parse(__dirname + '/data/slideType.xlsx');
+      await models.slide_type.bulkCreate(createMockData(data[0].data));
+
       console.log('-----------------------FINISHED INIT DATABASE-----------------------');
     } catch (e) {
       console.error(e.message);

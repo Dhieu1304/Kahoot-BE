@@ -21,6 +21,14 @@ module.exports = function (sequelize, DataTypes) {
           key: 'id',
         },
       },
+      presentation_theme_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'presentation_theme',
+          key: 'id',
+        },
+      },
     },
     {
       sequelize,

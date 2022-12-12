@@ -8,6 +8,37 @@ const findOneById = async (id) => {
   }
 };
 
+const listPresentation = async (user_id, limit, offset) => {
+  try {
+    return await models.presentation.findAndCountAll({
+      include: [
+        {
+          model: models.presentation_theme,
+          as: 'presentation_theme',
+          attributes: ['id', 'name', 'text_color', 'background_color'],
+        },
+        'presentation_theme',
+        {
+          model: models.presentation_member,
+          as: 'presentation_members',
+          where: { user_id: user_id },
+          attributes: ['user_id'],
+          include: {
+            model: models.group_user_role,
+            as: 'role',
+            attributes: ['name'],
+          },
+        },
+      ],
+      attributes: ['id', 'name'],
+      limit: limit,
+      offset: offset,
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 const createNewPresentation = async (presentation) => {
   try {
     return await models.presentation.create(presentation);
@@ -16,7 +47,17 @@ const createNewPresentation = async (presentation) => {
   }
 };
 
+const updatePresentation = async (id, updateObj) => {
+  try {
+    return await models.presentation.update(updateObj, { where: { id: id } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   findOneById,
+  listPresentation,
   createNewPresentation,
+  updatePresentation,
 };

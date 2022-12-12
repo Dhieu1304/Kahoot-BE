@@ -60,48 +60,6 @@ const getGroupsByUserIds = async ({ user_id, role_id, raw = false }) => {
   }
 };
 
-// const getGroupsByUserIds = async ({ user_id, role_id, raw = false }) => {
-//   try {
-//     user_id = parseInt(user_id) || -1;
-
-//     const group_userWhereOption = role_id
-//       ? {
-//           user_id: user_id,
-//           group_user_role_id: role_id,
-//         }
-//       : {
-//           user_id: user_id,
-//         };
-
-//     const options = {
-//       raw: raw,
-//       include: [
-//         {
-//           model: models.group_user,
-//           as: 'group_users',
-//           where: group_userWhereOption,
-
-//           include: [
-//             {
-//               model: models.user,
-//               as: 'user',
-//             },
-//             {
-//               model: models.group_user_role,
-//               as: 'group_user_role',
-//             },
-//           ],
-//         },
-//       ],
-//     };
-
-//     return await models.group.findAll(options);
-//   } catch (e) {
-//     console.error(e.message);
-//     return { status: false, message: e.message };
-//   }
-// };
-
 const createGroup = async ({
   name,
   member_can_share_content,

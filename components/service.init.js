@@ -9,3 +9,6 @@ module.exports.mailService = require('./mail/mail.service');
 module.exports.cryptoService = require('./crypto/crypto.service');
 module.exports.verifyService = require('./verify/verify.service');
 module.exports.groupUserService = require('./group-user/group-user.service');
+module.exports.presentationTypeService = require('./presentation-type/presentation-type.service');
+module.exports.presentationService = require('./presentation/presentation.service');
+module.exports.presentationMemberService = require('./presentation-member/presentation-member.service');

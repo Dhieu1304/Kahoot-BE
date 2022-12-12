@@ -45,6 +45,9 @@ const { PRESENTATION_TYPE } = require('../presentation-type/presentation-type.co
       data = xlsx.parse(__dirname + '/data/slideType.xlsx');
       await models.slide_type.bulkCreate(createMockData(data[0].data));
 
+      data = xlsx.parse(__dirname + '/data/presentationTheme.xlsx');
+      await models.presentation_theme.bulkCreate(createMockData(data[0].data));
+
       console.log('-----------------------FINISHED INIT DATABASE-----------------------');
     } catch (e) {
       console.error(e.message);

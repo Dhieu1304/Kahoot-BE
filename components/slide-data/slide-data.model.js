@@ -3,10 +3,16 @@ module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
     'slide_data',
     {
-      presentation_id: {
+      id: {
+        autoIncrement: true,
+        autoIncrementIdentity: true,
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
+      },
+      presentation_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
         references: {
           model: 'presentation',
           key: 'id',
@@ -15,7 +21,6 @@ module.exports = function (sequelize, DataTypes) {
       ordinal_slide_number: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        primaryKey: true,
       },
       user_id: {
         type: DataTypes.INTEGER,
@@ -43,7 +48,7 @@ module.exports = function (sequelize, DataTypes) {
         {
           name: 'slide_data_pkey',
           unique: true,
-          fields: [{ name: 'presentation_id' }, { name: 'ordinal_slide_number' }],
+          fields: [{ name: 'id' }],
         },
       ],
     },

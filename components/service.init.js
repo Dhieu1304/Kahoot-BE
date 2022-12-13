@@ -12,3 +12,5 @@ module.exports.groupUserService = require('./group-user/group-user.service');
 module.exports.presentationTypeService = require('./presentation-type/presentation-type.service');
 module.exports.presentationService = require('./presentation/presentation.service');
 module.exports.presentationMemberService = require('./presentation-member/presentation-member.service');
+module.exports.slideParentTypeService = require('./slide-parent-type/slide-parent-type.service');
+module.exports.slideService = require('./slide/slide.service');

@@ -5,7 +5,7 @@ const {
   presentationMemberService,
 } = require('../service.init');
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
-
+const { randomSixNumber } = require('../utils/randomNumber');
 const getListPresentation = async (req, res) => {
   const { id } = req.user;
   const { page, limit } = req.query;
@@ -20,8 +20,10 @@ const createNewPresentation = async (req, res) => {
   const { id } = req.user;
   const { name, type, themeId } = req.body;
   const typePresentation = await presentationTypeService.findOneByName(type);
+  const code = randomSixNumber();
   const newPresentation = await presentationService.createNewPresentation({
     name,
+    code,
     presentation_type_id: typePresentation.id,
     presentation_theme_id: themeId,
   });

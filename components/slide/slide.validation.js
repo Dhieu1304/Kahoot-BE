@@ -1,7 +1,6 @@
 const Joi = require('joi');
 
 const slide = Joi.object().keys({
-  presentation_id: Joi.number().required(),
   ordinal_slide_number: Joi.number().required(),
   slide_type_id: Joi.number().required(),
   title: Joi.string().default(''),
@@ -10,6 +9,7 @@ const slide = Joi.object().keys({
 
 const updateSlide = {
   body: Joi.object().keys({
+    presentation_id: Joi.number().required(),
     data: Joi.array().required().items(slide),
   }),
 };

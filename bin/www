@@ -23,11 +23,16 @@ app.set('port', port);
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+const presentationSocket = require("../components/socket/presentation.socket");
+const users = require('../components/socket/socketUser').getInstance();
 
 io.on('connection', (socket) => {
   console.log('a user connected');
+  users.userConnect(socket.id);
+  presentationSocket(io, socket);
   socket.on('disconnect', () => {
     console.log('user disconnected');
+    users.userDisconnect(socket.id);
   });
 });
 

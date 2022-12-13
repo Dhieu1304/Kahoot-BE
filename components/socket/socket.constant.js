@@ -1,0 +1,14 @@
+const SOCKET_EVENT = {
+  NOTIFICATION: 'NOTIFICATION',
+  ERROR: 'ERROR',
+  SUCCESS: 'SUCCESS',
+};
+
+const PRESENTATION_EVENT = {
+  JOIN: 'JOIN',
+};
+
+module.exports = {
+  SOCKET_EVENT,
+  PRESENTATION_EVENT,
+};

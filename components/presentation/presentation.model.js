@@ -13,6 +13,11 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
+      code: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: 'presentation_code_key',
+      },
       presentation_type_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -40,6 +45,11 @@ module.exports = function (sequelize, DataTypes) {
           name: 'presentation_pkey',
           unique: true,
           fields: [{ name: 'id' }],
+        },
+        {
+          name: 'presentation_code_key',
+          unique: true,
+          fields: [{ name: 'code' }],
         },
       ],
     },

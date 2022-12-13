@@ -4,7 +4,9 @@ const presentationController = require('./presentation.controller');
 const presentationValidation = require('./presentation.validation');
 const validate = require('../middleware/validate');
 const { jwtAuth } = require('../middleware/jwt.auth');
+const presentationThemeController = require('../presentation-theme/presentation-theme.controller');
 
+router.get('/theme', presentationThemeController.listPresentationTheme);
 router.get(
   '/list',
   jwtAuth,

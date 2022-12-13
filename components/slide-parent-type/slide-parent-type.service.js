@@ -18,6 +18,7 @@ const getAllSlideType = async () => {
           attributes: ['id', 'name'],
         },
       ],
+      attributes: ['id', 'name'],
     });
   } catch (e) {
     console.error(e.message);

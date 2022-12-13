@@ -25,6 +25,7 @@ function initModels(sequelize) {
   const user = _user(sequelize, DataTypes);
   const verify = _verify(sequelize, DataTypes);
   const group_user = _group_user(sequelize, DataTypes);
+  const presentation_theme = _presentation_theme(sequelize, DataTypes);
   const presentation_type = _presentation_type(sequelize, DataTypes);
   const presentation = _presentation(sequelize, DataTypes);
   const presentation_member = _presentation_member(sequelize, DataTypes);
@@ -32,7 +33,6 @@ function initModels(sequelize) {
   const slide_type = _slide_type(sequelize, DataTypes);
   const slide = _slide(sequelize, DataTypes);
   const slide_data = _slide_data(sequelize, DataTypes);
-  const presentation_theme = _presentation_theme(sequelize, DataTypes);
 
   group.belongsToMany(user, {
     as: 'user_id_users',

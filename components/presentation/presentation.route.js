@@ -25,5 +25,11 @@ router.put(
   validate(presentationValidation.editPresentation),
   presentationController.editPresentation,
 );
+router.get(
+  '/:id',
+  jwtAuth,
+  validate(presentationValidation.presentationDetail),
+  presentationController.getPresentationDetail,
+);
 
 module.exports = router;

@@ -25,8 +25,15 @@ const editPresentation = {
   }),
 };
 
+const presentationDetail = {
+  param: Joi.object().keys({
+    id: Joi.number().required(),
+  }),
+};
+
 module.exports = {
   listPresentation,
   createPresentation,
   editPresentation,
+  presentationDetail,
 };

@@ -9,6 +9,15 @@ const editMultiSlide = async (presentation_id, slides) => {
   }
 };
 
+const getAllSlidePresentation = async (presentation_id) => {
+  try {
+    return await models.slide.findAll({ where: { presentation_id } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   editMultiSlide,
+  getAllSlidePresentation,
 };

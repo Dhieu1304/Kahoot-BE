@@ -15,9 +15,10 @@ const listPresentation = async (user_id, limit, offset) => {
         {
           model: models.presentation_theme,
           as: 'presentation_theme',
-          attributes: ['id', 'name', 'text_color', 'background_color'],
+          attributes: {
+            exclude: ['createdAt', 'updatedAt'],
+          },
         },
-        'presentation_theme',
         {
           model: models.presentation_member,
           as: 'presentation_members',

@@ -3,6 +3,7 @@ const {
   presentationTypeService,
   groupUserRoleService,
   presentationMemberService,
+  slideService,
 } = require('../service.init');
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 const { randomSixNumber } = require('../utils/randomNumber');
@@ -62,8 +63,18 @@ const editPresentation = async (req, res) => {
   return res.status(400).json({ status: false, message: 'Error' });
 };
 
+const getPresentationDetail = async (req, res) => {
+  const { id } = req.params;
+  const presentationDetail = await slideService.getAllSlidePresentation(id);
+  for (let i = 0; i < presentationDetail.length; i++) {
+    presentationDetail[i].body = JSON.parse(presentationDetail[i].body);
+  }
+  return res.status(200).json({ status: true, message: 'Successful', data: presentationDetail });
+};
+
 module.exports = {
   getListPresentation,
   createNewPresentation,
   editPresentation,
+  getPresentationDetail,
 };

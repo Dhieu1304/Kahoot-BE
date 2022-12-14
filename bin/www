@@ -22,7 +22,7 @@ app.set('port', port);
 
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: '*'} });
 const presentationSocket = require("../components/socket/presentation.socket");
 const users = require('../components/socket/socketUser').getInstance();
 

@@ -4,10 +4,15 @@ const socketPresentation = (function () {
     const presentations = [];
     return {
       addPresentation: function (presentation_id, code, ordinal_slide_number) {
-        presentations.push({ presentation_id, code, ordinal_slide_number });
+        const index = presentations.findIndex((presentation) => presentation.presentation_id === presentation_id);
+        if (index === -1) presentations.push({ presentation_id, code, ordinal_slide_number });
+        else {
+          presentations[index].code = code;
+          presentations[index].ordinal_slide_number = ordinal_slide_number;
+        }
       },
       removePresentation: function (presentation_id) {
-        const index = presentations.findIndex((presentation) => presentations.presentation_id === presentation_id);
+        const index = presentations.findIndex((presentation) => presentation.presentation_id === presentation_id);
         if (index !== -1) {
           presentations.splice(index, 1);
         }

@@ -9,6 +9,8 @@ const PRESENTATION_EVENT = {
   LEAVE: 'LEAVE',
   COUNT_ONL: 'COUNT_ONL',
   SLIDE: 'SLIDE',
+  PRESENT: 'PRESENT',
+  STOP_PRESENT: 'STOP_PRESENT',
 };
 
 module.exports = {

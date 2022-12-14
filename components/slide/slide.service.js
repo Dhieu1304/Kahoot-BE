@@ -1,4 +1,6 @@
 const models = require('../models');
+const { Sequelize } = require('sequelize');
+const sequelize = require('sequelize');
 
 const editMultiSlide = async (presentation_id, slides) => {
   try {
@@ -27,8 +29,22 @@ const findOneSlide = async (presentation_id, ordinal_slide_number) => {
   }
 };
 
+const dataCountSlide = async (presentation_id, ordinal_slide_number) => {
+  try {
+    return await models.slide_data.findAll({
+      where: { presentation_id, ordinal_slide_number },
+      group: ['name'],
+      attributes: ['name', [Sequelize.fn('COUNT', 'name'), 'count']],
+      raw: true,
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   editMultiSlide,
   getAllSlidePresentation,
   findOneSlide,
+  dataCountSlide,
 };

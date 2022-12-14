@@ -6,6 +6,9 @@ const SOCKET_EVENT = {
 
 const PRESENTATION_EVENT = {
   JOIN: 'JOIN',
+  LEAVE: 'LEAVE',
+  COUNT_ONL: 'COUNT_ONL',
+  SLIDE: 'SLIDE',
 };
 
 module.exports = {

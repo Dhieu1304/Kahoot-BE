@@ -17,7 +17,16 @@ const getAllSlidePresentation = async (presentation_id) => {
   }
 };
 
+const findOneSlide = async (presentation_id, ordinal_slide_number) => {
+  try {
+    return await models.slide.findOne({ where: { presentation_id, ordinal_slide_number } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   editMultiSlide,
   getAllSlidePresentation,
+  findOneSlide,
 };

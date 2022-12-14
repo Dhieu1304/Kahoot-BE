@@ -3,20 +3,29 @@ const socketUser = (function () {
   function init() {
     const currentUsers = [];
     return {
-      userConnect: function (id) {
-        currentUsers.push(id);
+      userConnect: function (id, code) {
+        currentUsers.push({ id, code });
       },
       getCurrentUser: function () {
         return currentUsers;
       },
+      countUserInRoom: function (code) {
+        let result = 0;
+        for (let i = 0; i < currentUsers.length; i++) {
+          if (currentUsers.code === code) {
+            result++;
+          }
+        }
+        return result;
+      },
       userDisconnect: function (id) {
-        const index = currentUsers.findIndex((socketId) => socketId === id);
+        const index = currentUsers.findIndex((user) => user.id === id);
         if (index !== -1) {
           currentUsers.splice(index, 1);
         }
       },
       findCurrentUserBySocketId: function (id) {
-        return currentUsers.find((socketId) => socketId === id);
+        return currentUsers.find((user) => user.id === id);
       },
     };
   }

@@ -18,7 +18,9 @@ const presentationSocket = (io, socket) => {
       users.userConnect(socket.id, code);
       const slideDetail = await slideService.findOneSlide(slide.presentation_id, slide.ordinal_slide_number);
       socket.emit(PRESENTATION_EVENT.SLIDE, slideDetail);
-      io.in(code).emit(PRESENTATION_EVENT.COUNT_ONL, users.countUserInRoom().length);
+      io.in(code)
+        .in(slide.presentation_id.toString())
+        .emit(PRESENTATION_EVENT.COUNT_ONL, users.countUserInRoom().length);
     });
 
     socket.on(PRESENTATION_EVENT.LEAVE, (data) => {

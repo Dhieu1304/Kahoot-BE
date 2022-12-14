@@ -37,7 +37,7 @@ router.get(
   validate(presentationValidation.presentationDetail),
   presentationController.getAllSlidePresentation,
 );
-router.delete(
+router.post(
   '/delete',
   jwtAuth,
   validate(presentationValidation.deletePresentation),

@@ -15,9 +15,7 @@ const listPresentation = async (user_id, limit, offset) => {
         {
           model: models.presentation_theme,
           as: 'presentation_theme',
-          attributes: {
-            exclude: ['createdAt', 'updatedAt'],
-          },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
         {
           model: models.presentation_member,
@@ -31,7 +29,7 @@ const listPresentation = async (user_id, limit, offset) => {
           },
         },
       ],
-      attributes: ['id', 'name'],
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
       limit: limit,
       offset: offset,
     });
@@ -64,16 +62,12 @@ const getDetailPresentation = async (id) => {
         {
           model: models.presentation_theme,
           as: 'presentation_theme',
-          attributes: {
-            exclude: ['createdAt', 'updatedAt'],
-          },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
         {
           model: models.presentation_type,
           as: 'presentation_type',
-          attributes: {
-            exclude: ['createdAt', 'updatedAt'],
-          },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
         },
       ],
       attributes: { exclude: ['createdAt', 'updatedAt'] },

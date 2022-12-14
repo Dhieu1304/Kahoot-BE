@@ -56,9 +56,37 @@ const updatePresentation = async (id, updateObj) => {
   }
 };
 
+const getDetailPresentation = async (id) => {
+  try {
+    return await models.presentation.findOne({
+      where: { id },
+      include: [
+        {
+          model: models.presentation_theme,
+          as: 'presentation_theme',
+          attributes: {
+            exclude: ['createdAt', 'updatedAt'],
+          },
+        },
+        {
+          model: models.presentation_type,
+          as: 'presentation_type',
+          attributes: {
+            exclude: ['createdAt', 'updatedAt'],
+          },
+        },
+      ],
+      attributes: ['id', 'name'],
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   findOneById,
   listPresentation,
   createNewPresentation,
   updatePresentation,
+  getDetailPresentation,
 };

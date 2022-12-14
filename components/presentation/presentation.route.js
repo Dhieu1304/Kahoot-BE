@@ -31,5 +31,11 @@ router.get(
   validate(presentationValidation.presentationDetail),
   presentationController.getPresentationDetail,
 );
+router.get(
+  '/:id/all-slide',
+  jwtAuth,
+  validate(presentationValidation.presentationDetail),
+  presentationController.getAllSlidePresentation,
+);
 
 module.exports = router;

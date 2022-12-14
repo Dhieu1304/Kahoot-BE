@@ -65,6 +65,12 @@ const editPresentation = async (req, res) => {
 
 const getPresentationDetail = async (req, res) => {
   const { id } = req.params;
+  const presentationDetail = await presentationService.getDetailPresentation(id);
+  return res.status(200).json({ status: true, message: 'Successful', data: presentationDetail });
+};
+
+const getAllSlidePresentation = async (req, res) => {
+  const { id } = req.params;
   const presentationDetail = await slideService.getAllSlidePresentation(id);
   for (let i = 0; i < presentationDetail.length; i++) {
     presentationDetail[i].body = JSON.parse(presentationDetail[i].body);
@@ -77,4 +83,5 @@ module.exports = {
   createNewPresentation,
   editPresentation,
   getPresentationDetail,
+  getAllSlidePresentation,
 };

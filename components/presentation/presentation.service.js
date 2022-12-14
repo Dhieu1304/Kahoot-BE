@@ -76,8 +76,19 @@ const getDetailPresentation = async (id) => {
           },
         },
       ],
-      attributes: ['id', 'name'],
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
     });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
+const deletePresentationById = async (id) => {
+  try {
+    await models.presentation_member.destroy({ where: { presentation_id: id } });
+    await models.slide_data.destroy({ where: { presentation_id: id } });
+    await models.slide.destroy({ where: { presentation_id: id } });
+    await models.presentation.destroy({ where: { id } });
   } catch (e) {
     console.error(e.message);
   }
@@ -89,4 +100,5 @@ module.exports = {
   createNewPresentation,
   updatePresentation,
   getDetailPresentation,
+  deletePresentationById,
 };

@@ -31,9 +31,16 @@ const presentationDetail = {
   }),
 };
 
+const deletePresentation = {
+  param: Joi.object().keys({
+    presentation_id: Joi.number().required(),
+  }),
+};
+
 module.exports = {
   listPresentation,
   createPresentation,
   editPresentation,
   presentationDetail,
+  deletePresentation,
 };

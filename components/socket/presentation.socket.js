@@ -33,7 +33,12 @@ const presentationSocket = (io, socket) => {
       const presentation_id = +data?.presentation_id;
       const ordinal_slide_number = +data?.ordinal_slide_number;
       const presentation = await presentationService.findOneById(presentation_id);
+      if (!presentation) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid presentation');
+      }
       const code = +presentation?.code;
+      socket.join(presentation_id.toString());
+      console.log(presentation_id, ordinal_slide_number, code);
       if (!presentation_id || !ordinal_slide_number || !code) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
@@ -48,9 +53,8 @@ const presentationSocket = (io, socket) => {
       if (!presentation_id) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
-      const presentation = presentations.findCurrentSlideByPresentationId(presentation_id);
       presentations.removePresentation(presentation_id);
-      io.in(presentation.code.toString()).emit(PRESENTATION_EVENT.SLIDE, 'The host is stop slideshow');
+      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE, 'The host is stop slideshow');
     });
 
     socket.on(PRESENTATION_EVENT.SUBMIT_ANSWER, async (data) => {
@@ -74,7 +78,17 @@ const presentationSocket = (io, socket) => {
         presentation.presentation_id,
         presentation.ordinal_slide_number,
       );
-      io.in(code.toString()).emit(PRESENTATION_EVENT.NEW_DATA, dataCount);
+      io.in(presentation.presentation_id.toString()).emit(PRESENTATION_EVENT.NEW_DATA, dataCount);
+    });
+
+    socket.on(PRESENTATION_EVENT.NEW_DATA, async (data) => {
+      const presentation_id = +data.presentation_id;
+      const ordinal_slide_number = +data.ordinal_slide_number;
+      if (!presentation_id || !ordinal_slide_number) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+      }
+      const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
+      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.NEW_DATA, dataCount);
     });
   } catch (e) {
     console.error(e.message);

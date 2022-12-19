@@ -33,6 +33,10 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING(1000000),
         allowNull: true,
       },
+      description: {
+        type: DataTypes.STRING(10000),
+        allowNull: true,
+      },
     },
     {
       sequelize,

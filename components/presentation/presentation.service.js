@@ -29,7 +29,7 @@ const listPresentation = async (user_id, limit, offset) => {
           },
         },
       ],
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      // attributes: { exclude: ['createdAt', 'updatedAt'] },
       limit: limit,
       offset: offset,
     });

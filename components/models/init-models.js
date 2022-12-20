@@ -15,6 +15,8 @@ const _slide_type = require('../slide-type/slide-type.model');
 const _slide = require('../slide/slide.model');
 const _slide_data = require('../slide-data/slide-data.model');
 const _presentation_theme = require('../presentation-theme/presentation-theme.model');
+const _slide_message = require('../slide-message/slide-message.model');
+const _slide_question = require('../slide-question/slide-question.model');
 
 function initModels(sequelize) {
   const verify_type = _verify_type(sequelize, DataTypes);
@@ -33,6 +35,8 @@ function initModels(sequelize) {
   const slide_type = _slide_type(sequelize, DataTypes);
   const slide = _slide(sequelize, DataTypes);
   const slide_data = _slide_data(sequelize, DataTypes);
+  const slide_message = _slide_message(sequelize, DataTypes);
+  const slide_question = _slide_question(sequelize, DataTypes);
 
   group.belongsToMany(user, {
     as: 'user_id_users',
@@ -101,6 +105,12 @@ function initModels(sequelize) {
   user.hasMany(slide_data, { as: 'slide_data', foreignKey: 'user_id' });
   presentation.belongsTo(presentation_theme, { as: 'presentation_theme', foreignKey: 'presentation_theme_id' });
   presentation_theme.hasMany(presentation, { as: 'presentations', foreignKey: 'presentation_theme_id' });
+  slide_question.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
+  presentation.hasMany(slide_question, { as: 'slide_questions', foreignKey: 'presentation_id' });
+  slide_message.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
+  presentation.hasMany(slide_message, { as: 'slide_messages', foreignKey: 'presentation_id' });
+  slide_message.belongsTo(user, { as: 'user', foreignKey: 'user_id' });
+  user.hasMany(slide_message, { as: 'slide_messages', foreignKey: 'user_id' });
 
   return {
     group,
@@ -119,8 +129,11 @@ function initModels(sequelize) {
     slide,
     slide_data,
     presentation_theme,
+    slide_message,
+    slide_question,
   };
 }
+
 module.exports = initModels;
 module.exports.initModels = initModels;
 module.exports.default = initModels;

@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
-    'slide_message',
+    'slide_question',
     {
       id: {
         autoIncrement: true,
@@ -22,27 +22,28 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      user_id: {
+      question: {
+        type: DataTypes.STRING(1000),
+        allowNull: false,
+      },
+      vote: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: {
-          model: 'user',
-          key: 'id',
-        },
+        defaultValue: 0,
       },
-      message: {
-        type: DataTypes.STRING(1000),
+      vote_by: {
+        type: DataTypes.STRING(10000),
         allowNull: true,
       },
     },
     {
       sequelize,
-      tableName: 'slide_message',
+      tableName: 'slide_question',
       schema: 'public',
       timestamps: true,
       indexes: [
         {
-          name: 'slide_message_pkey',
+          name: 'slide_question_pkey',
           unique: true,
           fields: [{ name: 'id' }],
         },

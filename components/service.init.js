@@ -17,3 +17,5 @@ module.exports.slideDataService = require('./slide-data/slide-data.service');
 module.exports.slideParentTypeService = require('./slide-parent-type/slide-parent-type.service');
 module.exports.slideTypeService = require('./slide-type/slide-type.service');
 module.exports.slideService = require('./slide/slide.service');
+module.exports.slideMessageService = require('./slide-message/slide-message.service');
+module.exports.slideQuestionService = require('./slide-question/slide-question.service');

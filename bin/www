@@ -24,11 +24,15 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, { cors: { origin: '*'} });
 const presentationSocket = require("../components/socket/presentation.socket");
+const chatSocket = require("../components/socket/chat.socket");
+const questionSocket = require("../components/socket/question.socket");
 const users = require('../components/socket/socketUser').getInstance();
 
 io.on('connection', (socket) => {
   console.log('a user connected');
   presentationSocket(io, socket);
+  chatSocket(io, socket);
+  questionSocket(io, socket);
   socket.on('disconnect', () => {
     console.log('user disconnected');
     users.userDisconnect(socket.id);

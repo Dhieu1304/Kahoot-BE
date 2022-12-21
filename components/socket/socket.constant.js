@@ -15,7 +15,20 @@ const PRESENTATION_EVENT = {
   NEW_DATA: 'NEW_DATA',
 };
 
+const CHAT_EVENT = {
+  MESSAGE: 'MESSAGE',
+};
+
+const QUESTION_EVENT = {
+  QUESTION: 'QUESTION',
+  VOTE: 'VOTE',
+  UP_VOTE: 'UP_VOTE',
+  DOWN_VOTE: 'DOWN_VOTE',
+};
+
 module.exports = {
   SOCKET_EVENT,
   PRESENTATION_EVENT,
+  CHAT_EVENT,
+  QUESTION_EVENT,
 };

@@ -18,10 +18,6 @@ module.exports = function (sequelize, DataTypes) {
           key: 'id',
         },
       },
-      ordinal_slide_number: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       question: {
         type: DataTypes.STRING(1000),
         allowNull: false,

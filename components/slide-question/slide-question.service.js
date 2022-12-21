@@ -1,29 +1,73 @@
 const models = require('../models');
-const { Op } = require('sequelize');
 
-const createNewSlideData = async (slideDataObj) => {
+const createNewSlideQuestion = async (slideQuestionObj) => {
   try {
-    await models.slide_data.create(slideDataObj);
+    return await models.slide_question.create(slideQuestionObj);
   } catch (e) {
     console.error(e.message);
+    return false;
   }
 };
 
-const deleteAllExceptInput = async (presentation_id, ordinal_slide_number, except) => {
+const deleteAllPreSession = async (presentation_id) => {
   try {
-    return await models.slide_data.destroy({
+    return await models.slide_question.destroy({
       where: {
         presentation_id,
-        ordinal_slide_number,
-        name: { [Op.notIn]: except },
       },
     });
   } catch (e) {
     console.error(e.message);
+    return false;
+  }
+};
+
+const upVoteQuestion = async (id, user_id) => {
+  try {
+    const question = await models.slide_question.findOne({ where: { id } });
+    if (!question) return false;
+    if (user_id) {
+      const userVote = JSON.parse(question.vote_by);
+      if (!userVote.includes(user_id)) {
+        userVote.push(user_id);
+        question.vote_by = JSON.stringify(userVote);
+        question.vote += 1;
+      }
+    } else {
+      question.vote += 1;
+    }
+    await question.save();
+    return question;
+  } catch (e) {
+    console.error(e.message);
+    return false;
+  }
+};
+
+const downVoteQuestion = async (id, user_id) => {
+  try {
+    const question = await models.slide_question.findOne({ where: { id } });
+    if (!question) return false;
+    if (user_id) {
+      const userVote = JSON.parse(question.vote_by);
+      const index = userVote.findIndex((userId) => userId === userId);
+      if (index !== -1) userVote.splice(index, 1);
+      question.vote_by = JSON.stringify(userVote);
+      question.vote -= 1;
+    } else {
+      question.vote -= 1;
+    }
+    await question.save();
+    return question;
+  } catch (e) {
+    console.error(e.message);
+    return false;
   }
 };
 
 module.exports = {
-  createNewSlideData,
-  deleteAllExceptInput,
+  createNewSlideQuestion,
+  deleteAllPreSession,
+  upVoteQuestion,
+  downVoteQuestion,
 };

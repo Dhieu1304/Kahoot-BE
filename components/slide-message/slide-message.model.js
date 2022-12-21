@@ -18,10 +18,6 @@ module.exports = function (sequelize, DataTypes) {
           key: 'id',
         },
       },
-      ordinal_slide_number: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -30,13 +26,9 @@ module.exports = function (sequelize, DataTypes) {
           key: 'id',
         },
       },
-      name: {
+      message: {
         type: DataTypes.STRING(50),
-        allowNull: true,
-      },
-      value: {
-        type: DataTypes.STRING(1000),
-        allowNull: true,
+        allowNull: false,
       },
     },
     {

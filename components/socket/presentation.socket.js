@@ -38,7 +38,7 @@ const presentationSocket = (io, socket) => {
       }
       const code = +presentation?.code;
       socket.join(presentation_id.toString());
-      console.log(presentation_id, ordinal_slide_number, code);
+      socket.join(code.toString());
       if (!presentation_id || !ordinal_slide_number || !code) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
@@ -50,17 +50,20 @@ const presentationSocket = (io, socket) => {
 
     socket.on(PRESENTATION_EVENT.STOP_PRESENT, (data) => {
       const presentation_id = +data?.presentation_id;
-      if (!presentation_id) {
+      const user_id = +data?.user_id;
+      if (!presentation_id || !user_id) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
-      presentations.removePresentation(presentation_id);
+      const removePresent = presentations.removePresentation(presentation_id, user_id);
+      if (!removePresent) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'You do not have permission');
+      }
       io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE, 'The host is stop slideshow');
     });
 
     socket.on(PRESENTATION_EVENT.SUBMIT_ANSWER, async (data) => {
       const code = +data?.code;
       const name = data?.name;
-      console.log(code, name);
       if (!code || !name) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }

@@ -88,6 +88,16 @@ const deletePresentationById = async (id) => {
   }
 };
 
+const deletePresentSession = async (presentation_id) => {
+  try {
+    await models.slide_data.destroy({ where: { presentation_id } });
+    await models.slide_question.destroy({ where: { presentation_id } });
+    await models.slide_message.destroy({ where: { presentation_id } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   findOneById,
   listPresentation,
@@ -95,4 +105,5 @@ module.exports = {
   updatePresentation,
   getDetailPresentation,
   deletePresentationById,
+  deletePresentSession,
 };

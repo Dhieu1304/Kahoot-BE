@@ -43,5 +43,11 @@ router.post(
   validate(presentationValidation.deletePresentation),
   presentationController.deletePresentation,
 );
+router.post(
+  '/delete-session',
+  jwtAuth,
+  validate(presentationValidation.deleteSession),
+  presentationController.deleteSession,
+);
 
 module.exports = router;

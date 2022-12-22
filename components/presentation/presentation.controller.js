@@ -95,6 +95,17 @@ const deletePresentation = async (req, res) => {
   return res.status(200).json({ status: true, message: 'Delete successful' });
 };
 
+const deleteSession = async (req, res) => {
+  const { id } = req.user;
+  const { presentation_id } = req.body;
+  const presentationMember = await presentationMemberService.findOnePresentationMember(id, presentation_id);
+  if (!presentationMember || [1, 2].includes(presentationMember.role_id)) {
+    return res.status(400).json({ status: false, message: 'You not permission to delete this presentation' });
+  }
+  await presentationService.deletePresentSession(presentation_id);
+  return res.status(200).json({ status: true, message: 'Delete successful' });
+};
+
 module.exports = {
   getListPresentation,
   createNewPresentation,
@@ -102,4 +113,5 @@ module.exports = {
   getPresentationDetail,
   getAllSlidePresentation,
   deletePresentation,
+  deleteSession,
 };

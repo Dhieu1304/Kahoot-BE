@@ -67,7 +67,7 @@ const downVoteQuestion = async (id, user_id) => {
 
 const findByPresentationId = async (presentation_id, page, limit) => {
   try {
-    return await models.slide_question.find({
+    return await models.slide_question.findAll({
       where: {
         presentation_id,
       },

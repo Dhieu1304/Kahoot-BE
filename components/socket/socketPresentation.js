@@ -10,6 +10,7 @@ const socketPresentation = (function () {
           presentations[index].code = code;
           presentations[index].ordinal_slide_number = ordinal_slide_number;
         }
+        console.log(presentations);
       },
       removePresentation: function (presentation_id, user_id) {
         const index = presentations.findIndex(

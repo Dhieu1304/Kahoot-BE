@@ -24,7 +24,7 @@ const deleteAllPreSession = async (presentation_id) => {
 
 const findByPresentationId = async (presentation_id, page, limit) => {
   try {
-    return await models.slide_message.find({
+    return await models.slide_message.findAll({
       where: {
         presentation_id,
       },

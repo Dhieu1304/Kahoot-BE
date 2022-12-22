@@ -53,7 +53,7 @@ const presentationSocket = (io, socket) => {
       presentations.addPresentation(presentation_id, code, ordinal_slide_number);
       const slideDetail = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
       // present slide
-      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE, slideDetail);
+      io.in(code.toString()).emit(PRESENTATION_EVENT.SLIDE, slideDetail);
       // get slide data
       const dataCount = await slideService.dataCountSlide(
         presentation.presentation_id,

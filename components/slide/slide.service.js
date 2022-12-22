@@ -8,6 +8,7 @@ const editMultiSlide = async (presentation_id, slides) => {
     return await models.slide.bulkCreate(slides);
   } catch (e) {
     console.error(e.message);
+    return false;
   }
 };
 

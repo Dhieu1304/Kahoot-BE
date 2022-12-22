@@ -23,7 +23,19 @@ const deleteAllExceptInput = async (presentation_id, ordinal_slide_number, excep
   }
 };
 
+const deleteAllDataOfPresent = async (presentation_id) => {
+  try {
+    const isDel = await models.slide_data.destroy({ where: { presentation_id } });
+    console.log('----------------------', isDel);
+    return !!isDel;
+  } catch (e) {
+    console.error(e.message);
+    return false;
+  }
+};
+
 module.exports = {
   createNewSlideData,
   deleteAllExceptInput,
+  deleteAllDataOfPresent,
 };

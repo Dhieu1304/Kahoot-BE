@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
-    'slide_data',
+    'slide_message',
     {
       id: {
         autoIncrement: true,
@@ -33,12 +33,12 @@ module.exports = function (sequelize, DataTypes) {
     },
     {
       sequelize,
-      tableName: 'slide_data',
+      tableName: 'slide_message',
       schema: 'public',
       timestamps: true,
       indexes: [
         {
-          name: 'slide_data_pkey',
+          name: 'slide_message_pkey',
           unique: true,
           fields: [{ name: 'id' }],
         },

@@ -1,15 +1,16 @@
 const Joi = require('joi');
 
 const bodySlide = Joi.object().keys({
-  id: Joi.number().required(),
+  id: Joi.number().integer().required(),
   name: Joi.string().required(),
 });
 
 const slide = Joi.object().keys({
-  ordinal_slide_number: Joi.number().required(),
-  slide_type_id: Joi.number().required(),
-  title: Joi.string().default(''),
-  body: Joi.array().items(bodySlide),
+  ordinal_slide_number: Joi.number().integer().required(),
+  slide_type_id: Joi.number().integer().required(),
+  title: Joi.string().default(null),
+  body: Joi.array().items(bodySlide).default(null),
+  description: Joi.string().default(null),
 });
 
 const updateSlide = {

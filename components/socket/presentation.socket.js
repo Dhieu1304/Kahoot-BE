@@ -12,15 +12,16 @@ const presentations = require('./socketPresentation').getInstance();
 const presentationSocket = (io, socket) => {
   try {
     socket.on(PRESENTATION_EVENT.JOIN, async (data) => {
+      console.log('================JOIN PRESENTATION=================');
       const code = +data?.code;
       if (!code) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
-      socket.join(code.toString());
       const slide = presentations.findCurrentSlideByCode(code);
       if (!slide) {
         return socket.emit(PRESENTATION_EVENT.SLIDE, 'Please wait the host present this slide');
       }
+      socket.join(code.toString());
       users.userConnect(socket.id, code);
       const slideDetail = await slideService.findOneSlide(slide.presentation_id, slide.ordinal_slide_number);
       socket.emit(PRESENTATION_EVENT.SLIDE, slideDetail);
@@ -28,6 +29,7 @@ const presentationSocket = (io, socket) => {
     });
 
     socket.on(PRESENTATION_EVENT.LEAVE, (data) => {
+      console.log('================LEAVE PRESENTATION=================');
       const code = +data?.code;
       if (!code) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
@@ -100,17 +102,17 @@ const presentationSocket = (io, socket) => {
         presentation.presentation_id,
         presentation.ordinal_slide_number,
       );
-      io.in(presentation.presentation_id.toString()).emit(PRESENTATION_EVENT.NEW_DATA, dataCount);
+      io.in(presentation.presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, dataCount);
     });
 
-    socket.on(PRESENTATION_EVENT.NEW_DATA, async (data) => {
+    socket.on(PRESENTATION_EVENT.SLIDE_DATA, async (data) => {
       const presentation_id = +data.presentation_id;
       const ordinal_slide_number = +data.ordinal_slide_number;
       if (!presentation_id || !ordinal_slide_number) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
       const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
-      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.NEW_DATA, dataCount);
+      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, dataCount);
     });
 
     socket.on(CHAT_EVENT.GET_MESSAGE, async (data) => {

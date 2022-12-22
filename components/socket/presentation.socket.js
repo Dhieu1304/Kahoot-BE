@@ -1,5 +1,11 @@
-const { PRESENTATION_EVENT, SOCKET_EVENT } = require('./socket.constant');
-const { slideService, presentationService, slideDataService } = require('../service.init');
+const { PRESENTATION_EVENT, SOCKET_EVENT, CHAT_EVENT, QUESTION_EVENT } = require('./socket.constant');
+const {
+  slideService,
+  presentationService,
+  slideDataService,
+  slideMessageService,
+  slideQuestionService,
+} = require('../service.init');
 const users = require('./socketUser').getInstance();
 const presentations = require('./socketPresentation').getInstance();
 
@@ -37,14 +43,27 @@ const presentationSocket = (io, socket) => {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid presentation');
       }
       const code = +presentation?.code;
-      socket.join(presentation_id.toString());
-      socket.join(code.toString());
       if (!presentation_id || !ordinal_slide_number || !code) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
+      socket.join(presentation_id.toString());
+      socket.join(code.toString());
       presentations.addPresentation(presentation_id, code, ordinal_slide_number);
       const slideDetail = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+      // present slide
       io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE, slideDetail);
+      // get slide data
+      const dataCount = await slideService.dataCountSlide(
+        presentation.presentation_id,
+        presentation.ordinal_slide_number,
+      );
+      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, dataCount);
+      // message presentation
+      const message = await slideMessageService.findByPresentationId(presentation_id, 1, 50);
+      io.in(code.toString()).emit(CHAT_EVENT.MESSAGE, message);
+      // question presentation
+      const question = await slideQuestionService.findByPresentationId(presentation_id, 1, 50); //
+      io.in(code.toString()).emit(QUESTION_EVENT.QUESTION, question);
       socket.emit(SOCKET_EVENT.SUCCESS, `Present successful with slide ${ordinal_slide_number}`);
     });
 
@@ -92,6 +111,28 @@ const presentationSocket = (io, socket) => {
       }
       const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
       io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.NEW_DATA, dataCount);
+    });
+
+    socket.on(CHAT_EVENT.GET_MESSAGE, async (data) => {
+      const presentation_id = +data?.presentation_id;
+      const page = +data?.page;
+      const limit = +data?.limit;
+      if (!presentation_id || !page || !limit) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+      }
+      const message = await slideMessageService.findByPresentationId(presentation_id, page, limit);
+      socket.emit(CHAT_EVENT.GET_MESSAGE, message);
+    });
+
+    socket.on(QUESTION_EVENT.GET_QUESTION, async (data) => {
+      const presentation_id = +data?.presentation_id;
+      const page = +data?.page;
+      const limit = +data?.limit;
+      if (!presentation_id || !page || !limit) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+      }
+      const question = await slideQuestionService.findByPresentationId(presentation_id, page, limit); //
+      socket.emit(QUESTION_EVENT.QUESTION, question);
     });
   } catch (e) {
     console.error(e.message);

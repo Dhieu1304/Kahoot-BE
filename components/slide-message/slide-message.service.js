@@ -22,7 +22,23 @@ const deleteAllPreSession = async (presentation_id) => {
   }
 };
 
+const findByPresentationId = async (presentation_id, page, limit) => {
+  try {
+    return await models.slide_message.find({
+      where: {
+        presentation_id,
+      },
+      limit,
+      offset: page * limit,
+    });
+  } catch (e) {
+    console.error(e.message);
+    return false;
+  }
+};
+
 module.exports = {
   createNewSlideMessage,
   deleteAllPreSession,
+  findByPresentationId,
 };

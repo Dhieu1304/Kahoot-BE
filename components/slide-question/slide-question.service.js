@@ -65,9 +65,25 @@ const downVoteQuestion = async (id, user_id) => {
   }
 };
 
+const findByPresentationId = async (presentation_id, page, limit) => {
+  try {
+    return await models.slide_question.find({
+      where: {
+        presentation_id,
+      },
+      limit,
+      offset: page * limit,
+    });
+  } catch (e) {
+    console.error(e.message);
+    return false;
+  }
+};
+
 module.exports = {
   createNewSlideQuestion,
   deleteAllPreSession,
   upVoteQuestion,
   downVoteQuestion,
+  findByPresentationId,
 };

@@ -64,7 +64,7 @@ const presentationSocket = (io, socket) => {
       const message = await slideMessageService.findByPresentationId(presentation_id, 1, 50);
       io.in(code.toString()).emit(CHAT_EVENT.MESSAGE, message);
       // question presentation
-      const question = await slideQuestionService.findByPresentationId(presentation_id, 1, 50); //
+      const question = await slideQuestionService.findByPresentationId(presentation_id, 1, 50);
       io.in(code.toString()).emit(QUESTION_EVENT.QUESTION, question);
       socket.emit(SOCKET_EVENT.SUCCESS, `Present successful with slide ${ordinal_slide_number}`);
     });

@@ -8,9 +8,9 @@ const bodySlide = Joi.object().keys({
 const slide = Joi.object().keys({
   ordinal_slide_number: Joi.number().integer().required(),
   slide_type_id: Joi.number().integer().required(),
-  title: Joi.string().default(null),
-  body: Joi.array().items(bodySlide).default(null),
-  description: Joi.string().default(null),
+  title: Joi.string().default(null).allow('', null),
+  body: Joi.array().items(bodySlide).default(null).allow('', null),
+  description: Joi.string().default(null).allow('', null),
 });
 
 const updateSlide = {

@@ -39,34 +39,54 @@ const presentationSocket = (io, socket) => {
 
     socket.on(PRESENTATION_EVENT.PRESENT, async (data) => {
       const presentation_id = +data?.presentation_id;
-      const ordinal_slide_number = +data?.ordinal_slide_number;
       const presentation = await presentationService.findOneById(presentation_id);
       if (!presentation) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid presentation');
       }
       const code = +presentation?.code;
-      if (!presentation_id || !ordinal_slide_number || !code) {
+      if (!presentation_id || !code) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
+      let ordinal_slide_number;
       socket.join(presentation_id.toString());
       socket.join(code.toString());
-      presentations.addPresentation(presentation_id, code, ordinal_slide_number);
-      const slideDetail = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
-      // present slide
-      io.in(code.toString()).emit(PRESENTATION_EVENT.SLIDE, slideDetail);
+      const presentSocket = presentations.findCurrentSlideByCode(code);
+      if (!presentSocket) {
+        ordinal_slide_number = 1;
+        // todo add user is present
+        presentations.addPresentation(presentation_id, code, ordinal_slide_number, 1, '1');
+        socket.emit(PRESENTATION_EVENT.SLIDE_DETAIL, { ordinal_slide_number, user_id: 1, user_name: '1' });
+        // present slide to user (not host)
+        const slideDetail = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+        io.in(code.toString()).emit(PRESENTATION_EVENT.SLIDE, slideDetail);
+      } else {
+        ordinal_slide_number = presentSocket.ordinal_slide_number;
+        socket.emit(PRESENTATION_EVENT.SLIDE_DETAIL, {
+          ordinal_slide_number,
+          user_id: presentSocket.user_id,
+          user_name: presentSocket.user_name,
+        });
+      }
       // get slide data
       const dataCount = await slideService.dataCountSlide(
         presentation.presentation_id,
         presentation.ordinal_slide_number,
       );
-      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, dataCount);
+      // io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, dataCount);
+      socket.emit(PRESENTATION_EVENT.SLIDE_DATA, dataCount);
       // message presentation
       const message = await slideMessageService.findByPresentationId(presentation_id, 1, 50);
-      io.in(code.toString()).emit(CHAT_EVENT.MESSAGE, message);
+      // io.in(code.toString()).emit(CHAT_EVENT.MESSAGE, message);
+      socket.emit(CHAT_EVENT.MESSAGE, message);
       // question presentation
       const question = await slideQuestionService.findByPresentationId(presentation_id, 1, 50);
-      io.in(code.toString()).emit(QUESTION_EVENT.QUESTION, question);
+      // io.in(code.toString()).emit(QUESTION_EVENT.QUESTION, question);
+      socket.emit(QUESTION_EVENT.QUESTION, question);
       socket.emit(SOCKET_EVENT.SUCCESS, `Present successful with slide ${ordinal_slide_number}`);
+    });
+
+    socket.on(PRESENTATION_EVENT.PRESENT_OTHER_SLIDE, async (data) => {
+      // Todo
     });
 
     socket.on(PRESENTATION_EVENT.STOP_PRESENT, (data) => {

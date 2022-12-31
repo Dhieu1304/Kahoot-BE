@@ -44,20 +44,16 @@ const createNewPresentation = async (req, res) => {
 
 const editPresentation = async (req, res) => {
   const { id } = req.user;
-  const { presentationId, name, type, themeId } = req.body;
-  const body = pick(req.body, ['presentationId', 'name', 'presentation_type_id', 'presentation_theme_id']);
-  console.log('body', body);
-  const presentation = await presentationService.findOneById(body.presentationId);
+  const { presentationId } = req.body;
+  const body = pick(req.body, ['name', 'presentation_type_id', 'presentation_theme_id']);
+  const presentation = await presentationService.findOneById(presentationId);
   if (!presentation) {
     return res.status(400).json({ status: false, message: 'Invalid presentation' });
   }
-  const checkCanEdit = await presentationMemberService.checkCanEdit(id, body.presentationId);
+  const checkCanEdit = await presentationMemberService.checkCanEdit(id, presentationId);
   if (!checkCanEdit) {
     return res.status(403).json({ status: false, message: 'You do not have permission to edit' });
   }
-  delete body.presentationId;
-  console.log('body', body);
-  return;
   const updatedPresentation = await presentationService.updatePresentation(presentationId, body);
   if (updatedPresentation) {
     return res.status(200).json({ status: true, message: 'Successful' });

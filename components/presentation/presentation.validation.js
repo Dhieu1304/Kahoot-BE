@@ -19,9 +19,9 @@ const createPresentation = {
 const editPresentation = {
   body: Joi.object().keys({
     presentationId: Joi.number().required(),
-    name: Joi.string().required(),
-    type: Joi.string().valid(...Object.values(PRESENTATION_TYPE)),
-    themeId: Joi.number().default(1),
+    name: Joi.string(),
+    presentation_type_id: Joi.number().integer(),
+    presentation_theme_id: Joi.number().integer(),
   }),
 };
 

@@ -7,6 +7,7 @@ const {
 } = require('../service.init');
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 const { randomSixNumber } = require('../utils/randomNumber');
+const pick = require('../utils/pick');
 
 const getListPresentation = async (req, res) => {
   const { id } = req.user;
@@ -44,20 +45,20 @@ const createNewPresentation = async (req, res) => {
 const editPresentation = async (req, res) => {
   const { id } = req.user;
   const { presentationId, name, type, themeId } = req.body;
-  const presentation = await presentationService.findOneById(presentationId);
+  const body = pick(req.body, ['presentationId', 'name', 'presentation_type_id', 'presentation_theme_id']);
+  console.log('body', body);
+  const presentation = await presentationService.findOneById(body.presentationId);
   if (!presentation) {
     return res.status(400).json({ status: false, message: 'Invalid presentation' });
   }
-  const checkCanEdit = await presentationMemberService.checkCanEdit(id, presentationId);
+  const checkCanEdit = await presentationMemberService.checkCanEdit(id, body.presentationId);
   if (!checkCanEdit) {
     return res.status(403).json({ status: false, message: 'You do not have permission to edit' });
   }
-  const typePresentation = await presentationTypeService.findOneByName(type);
-  const updatedPresentation = await presentationService.updatePresentation(presentationId, {
-    name,
-    presentation_type_id: typePresentation.id,
-    presentation_theme_id: themeId,
-  });
+  delete body.presentationId;
+  console.log('body', body);
+  return;
+  const updatedPresentation = await presentationService.updatePresentation(presentationId, body);
   if (updatedPresentation) {
     return res.status(200).json({ status: true, message: 'Successful' });
   }

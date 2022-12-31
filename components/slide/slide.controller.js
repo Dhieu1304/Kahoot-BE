@@ -13,7 +13,7 @@ const updateSlidePresentation = async (req, res) => {
       .status(400)
       .json({ status: false, message: 'Can not update this presentation, please check your input' });
   }
-  return res.status(200).json({ status: true, message: 'Successful' });
+  return res.status(200).json({ status: true, message: 'Successful', data });
 };
 
 module.exports = {

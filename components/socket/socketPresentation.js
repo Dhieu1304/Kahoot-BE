@@ -36,6 +36,9 @@ const socketPresentation = (function () {
         }
         return false;
       },
+      getTotalPresent: function () {
+        return presentations.length;
+      },
     };
   }
 

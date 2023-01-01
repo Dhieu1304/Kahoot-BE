@@ -33,12 +33,12 @@ const presentationSocket = (io, socket) => {
       if (!code) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
+      users.userConnect(socket.id, code);
+      socket.join(code.toString());
       const slide = presentations.findCurrentSlideByCode(code);
       if (!slide) {
         return socket.emit(PRESENTATION_EVENT.SLIDE, 'Please wait the host present this slide');
       }
-      socket.join(code.toString());
-      users.userConnect(socket.id, code);
       const slideDetail = await slideService.findOneSlide(slide.presentation_id, slide.ordinal_slide_number);
       socket.emit(PRESENTATION_EVENT.SLIDE, slideDetail);
       io.in(slide.presentation_id.toString()).emit(PRESENTATION_EVENT.COUNT_ONL, users.countUserInRoom(code));
@@ -64,6 +64,7 @@ const presentationSocket = (io, socket) => {
 
   socket.on(PRESENTATION_EVENT.PRESENT, async (data) => {
     try {
+      console.log('================PRESENT PRESENTATION=================');
       // Todo, check user present
       const presentation_id = +data?.presentation_id;
       const presentation = await presentationService.findOneById(presentation_id);
@@ -76,26 +77,27 @@ const presentationSocket = (io, socket) => {
       }
       socket.join(presentation_id.toString());
       socket.join(code.toString());
-      let ordinal_slide_number;
+      let ordinal_slide_number = 0;
       const presentSocket = presentations.findCurrentSlideByCode(code);
       let slide;
       if (!presentSocket) {
         ordinal_slide_number = 1;
         // todo add user is present
         presentations.addPresentation(presentation_id, code, ordinal_slide_number, 1, '1');
-        // present slide to user (not host)
-        slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
-        io.in(code.toString()).emit(PRESENTATION_EVENT.SLIDE, slide);
       } else {
         ordinal_slide_number = presentSocket.ordinal_slide_number;
       }
+      slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+      if (!presentSocket) {
+        console.log(' >>>>>>>>>>>>>>>>>>> emit to client');
+        console.log(code);
+        io.in(code.toString()).emit(PRESENTATION_EVENT.SLIDE, slide);
+      }
       socket.emit(PRESENTATION_EVENT.SLIDE_DETAIL, { ordinal_slide_number, user_id: 1, user_name: '1' });
-      console.log('slide: ', slide);
       // get slide data
       if (slide && slide.slide_type_id === 1) {
-        const dataCount = await slideService.dataCountSlide(presentation.presentation_id, ordinal_slide_number);
+        const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
         convertDataSlide(slide.body, dataCount);
-        // io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, dataCount);
         socket.emit(PRESENTATION_EVENT.SLIDE_DATA, slide);
       }
       // message presentation
@@ -114,6 +116,8 @@ const presentationSocket = (io, socket) => {
   });
 
   socket.on(PRESENTATION_EVENT.PRESENT_OTHER_SLIDE, async (data) => {
+    console.log('================PRESENT OTHER SLIDE=================');
+
     // Todo
     try {
     } catch (e) {
@@ -124,6 +128,7 @@ const presentationSocket = (io, socket) => {
 
   socket.on(PRESENTATION_EVENT.STOP_PRESENT, (data) => {
     try {
+      console.log('================STOP PRESENTATION=================');
       const presentation_id = +data?.presentation_id;
       const user_id = +data?.user_id;
       if (!presentation_id || !user_id) {
@@ -134,6 +139,7 @@ const presentationSocket = (io, socket) => {
         return socket.emit(SOCKET_EVENT.ERROR, 'You do not have permission');
       }
       io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE, 'The host is stop slideshow');
+      console.log('TOTAL SLIDE IS PRESENT: ', presentations.getTotalPresent());
     } catch (e) {
       console.error(e.message);
       socket.emit(SOCKET_EVENT.ERROR, e.message);
@@ -142,6 +148,7 @@ const presentationSocket = (io, socket) => {
 
   socket.on(PRESENTATION_EVENT.SUBMIT_ANSWER, async (data) => {
     try {
+      console.log('================SUBMIT ANSWER=================');
       const code = +data?.code;
       const name = data?.name;
       if (!code || !name) {
@@ -172,18 +179,9 @@ const presentationSocket = (io, socket) => {
     }
   });
 
-  // socket.on(PRESENTATION_EVENT.SLIDE_DATA, async (data) => {
-  //   const presentation_id = +data.presentation_id;
-  //   const ordinal_slide_number = +data.ordinal_slide_number;
-  //   if (!presentation_id || !ordinal_slide_number) {
-  //     return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
-  //   }
-  //   const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
-  //   io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, dataCount);
-  // });
-
   socket.on(CHAT_EVENT.GET_MESSAGE, async (data) => {
     try {
+      console.log('================GET MESSAGE=================');
       const presentation_id = +data?.presentation_id;
       const page = +data?.page;
       const limit = +data?.limit;
@@ -200,6 +198,7 @@ const presentationSocket = (io, socket) => {
 
   socket.on(QUESTION_EVENT.GET_QUESTION, async (data) => {
     try {
+      console.log('================GET QUESTION=================');
       const presentation_id = +data?.presentation_id;
       const page = +data?.page;
       const limit = +data?.limit;

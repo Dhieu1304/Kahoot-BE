@@ -23,7 +23,9 @@ const getAllSlidePresentation = async (presentation_id) => {
 const findOneSlide = async (presentation_id, ordinal_slide_number) => {
   try {
     const slide = await models.slide.findOne({ where: { presentation_id, ordinal_slide_number } });
-    slide.body = JSON.parse(slide.body);
+    if (slide && slide.body) {
+      slide.body = JSON.parse(slide.body);
+    }
     return slide;
   } catch (e) {
     console.error(e.message);

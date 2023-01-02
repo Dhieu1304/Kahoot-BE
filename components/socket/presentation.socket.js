@@ -117,8 +117,27 @@ const presentationSocket = (io, socket) => {
 
   socket.on(PRESENTATION_EVENT.PRESENT_OTHER_SLIDE, async (data) => {
     console.log('================PRESENT OTHER SLIDE=================');
-
-    // Todo
+    const presentation_id = +data?.presentation_id;
+    const ordinal_slide_number = +data?.ordinal_slide_number;
+    const user_id = +data?.user_id;
+    // todo check user_id have permission
+    if (!presentation_id || !ordinal_slide_number) {
+      return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+    }
+    const presentSocket = presentations.findCurrentSlideByPresentationId(presentation_id);
+    if (!presentSocket) {
+      return socket.emit(SOCKET_EVENT.ERROR, 'Presentation is not present');
+    }
+    presentations.addPresentation(presentation_id, presentSocket.code, ordinal_slide_number);
+    const slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+    io.in(presentSocket.code.toString()).emit(PRESENTATION_EVENT.SLIDE, slide);
+    // get slide data
+    if (slide && slide.slide_type_id === 1) {
+      const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
+      convertDataSlide(slide.body, dataCount);
+      socket.emit(PRESENTATION_EVENT.SLIDE_DATA, slide);
+    }
+    socket.emit(SOCKET_EVENT.SUCCESS, `Change to slide ${ordinal_slide_number}`);
     try {
     } catch (e) {
       console.error(e.message);

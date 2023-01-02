@@ -1,4 +1,4 @@
-const { presentationMemberService } = require('../service.init');
+const { presentationMemberService, userService } = require('../service.init');
 
 const listMember = async (req, res) => {
   const { presentation_id } = req.query;
@@ -8,12 +8,16 @@ const listMember = async (req, res) => {
 
 const addMember = async (req, res) => {
   const { id } = req.user;
-  const { presentation_id, user_id } = req.body;
+  const { presentation_id, email } = req.body;
   const checkPermission = await presentationMemberService.checkCanEdit(id, presentation_id);
   if (!checkPermission) {
     return res.status(400).json({ status: false, message: 'You do not have permission' });
   }
-  const data = await presentationMemberService.addPresentationMember(presentation_id, user_id);
+  const coOwner = await userService.findOneByEmail(email);
+  if (!coOwner) {
+    return res.status(400).json({ status: false, message: `Do not find user with email: ${email}` });
+  }
+  const data = await presentationMemberService.addPresentationMember(presentation_id, coOwner.id);
   if (data) {
     return res.status(200).json({ status: true, message: 'Successful' });
   }
@@ -22,12 +26,16 @@ const addMember = async (req, res) => {
 
 const removeMember = async (req, res) => {
   const { id } = req.user;
-  const { presentation_id, user_id } = req.body;
+  const { presentation_id, email } = req.body;
   const checkPermission = await presentationMemberService.checkCanEdit(id, presentation_id);
   if (!checkPermission) {
     return res.status(400).json({ status: false, message: 'You do not have permission' });
   }
-  const data = await presentationMemberService.removePresentationMember(presentation_id, user_id);
+  const coOwner = await userService.findOneByEmail(email);
+  if (!coOwner) {
+    return res.status(400).json({ status: false, message: `Do not find user with email: ${email}` });
+  }
+  const data = await presentationMemberService.removePresentationMember(presentation_id, coOwner.id);
   if (data) {
     return res.status(200).json({ status: true, message: 'Successful' });
   }

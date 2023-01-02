@@ -9,7 +9,7 @@ const listMember = {
 const addCoOwner = {
   body: Joi.object().keys({
     presentation_id: Joi.number().integer().required(),
-    user_id: Joi.number().integer().required(),
+    email: Joi.string().email().required(),
   }),
 };
 

@@ -1,4 +1,5 @@
 const models = require('../models');
+const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 
 const findOneById = async (id) => {
   try {
@@ -75,6 +76,24 @@ const getDetailPresentation = async (id) => {
           model: models.presentation_type,
           as: 'presentation_type',
           attributes: { exclude: ['createdAt', 'updatedAt'] },
+        },
+        {
+          model: models.presentation_member,
+          as: 'presentation_members',
+          include: [
+            {
+              model: models.group_user_role,
+              as: 'role',
+              where: { name: GROUP_USER_ROLE.OWNER },
+              attributes: ['name'],
+            },
+            {
+              model: models.user,
+              as: 'user',
+              attributes: ['id', 'email', 'full_name', 'avatar'],
+            },
+          ],
+          attributes: ['createdAt', 'updatedAt'],
         },
       ],
       attributes: { exclude: ['createdAt', 'updatedAt'] },

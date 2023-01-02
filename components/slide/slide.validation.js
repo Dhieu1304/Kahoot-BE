@@ -20,6 +20,13 @@ const updateSlide = {
   }),
 };
 
+const deleteSlideData = {
+  body: Joi.object().keys({
+    presentation_id: Joi.number().integer().required(),
+  }),
+};
+
 module.exports = {
   updateSlide,
+  deleteSlideData,
 };

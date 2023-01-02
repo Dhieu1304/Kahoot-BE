@@ -8,7 +8,7 @@ const updateSlidePresentation = async (req, res) => {
     dataRes.push(Object.assign({}, data[i]));
     data[i].body = JSON.stringify(data[i].body);
   }
-  await slideDataService.deleteAllDataOfPresent(presentation_id);
+  // await slideDataService.deleteAllDataOfPresent(presentation_id);
   const isEdit = await slideService.editMultiSlide(presentation_id, data);
   if (!isEdit) {
     return res
@@ -18,6 +18,13 @@ const updateSlidePresentation = async (req, res) => {
   return res.status(200).json({ status: true, message: 'Successful', data: dataRes });
 };
 
+const deleteSlideData = async (req, res) => {
+  const { presentation_id } = req.body;
+  await slideDataService.deleteAllDataOfPresent(presentation_id);
+  return res.status(200).json({ status: true, message: 'Successful' });
+};
+
 module.exports = {
   updateSlidePresentation,
+  deleteSlideData,
 };

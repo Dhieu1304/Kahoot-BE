@@ -9,38 +9,30 @@ const findOneById = async (id) => {
   }
 };
 
-const listPresentation = async (user_id, limit, offset) => {
+const listPresentation = async (user_id, role = null) => {
   try {
-    return await models.presentation.findAndCountAll({
+    const options = {
       include: [
-        {
-          model: models.presentation_theme,
-          as: 'presentation_theme',
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
-        },
         {
           model: models.presentation_member,
           as: 'presentation_members',
           where: { user_id: user_id },
-          include: [
-            {
-              model: models.group_user_role,
-              as: 'role',
-              attributes: ['name'],
-            },
-            {
-              model: models.user,
-              as: 'user',
-              attributes: ['id', 'email', 'full_name', 'avatar'],
-            },
-          ],
-          attributes: ['createdAt', 'updatedAt'],
+          attributes: [],
         },
       ],
-      // attributes: { exclude: ['createdAt', 'updatedAt'] },
-      limit: limit,
-      offset: offset,
-    });
+      order: ['id'],
+    };
+    if (role) {
+      options.include[0].include = [
+        {
+          model: models.group_user_role,
+          as: 'role',
+          where: { name: role },
+          attributes: [],
+        },
+      ];
+    }
+    return await models.presentation.findAll(options);
   } catch (e) {
     console.error(e.message);
   }
@@ -84,7 +76,6 @@ const getDetailPresentation = async (id) => {
             {
               model: models.group_user_role,
               as: 'role',
-              where: { name: GROUP_USER_ROLE.OWNER },
               attributes: ['name'],
             },
             {
@@ -93,10 +84,8 @@ const getDetailPresentation = async (id) => {
               attributes: ['id', 'email', 'full_name', 'avatar'],
             },
           ],
-          attributes: ['createdAt', 'updatedAt'],
         },
       ],
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
     });
   } catch (e) {
     console.error(e.message);

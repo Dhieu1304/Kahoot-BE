@@ -70,6 +70,25 @@ const removePresentationMember = async (presentation_id, user_id) => {
   }
 };
 
+const findOwner = async (presentation_id) => {
+  try {
+    return await models.presentation_member.findOne({
+      where: { presentation_id, role_id: 1 },
+      include: [
+        {
+          model: models.user,
+          as: 'user',
+          attributes: ['id', 'email', 'full_name', 'avatar'],
+        },
+      ],
+      raw: true,
+      nest: true,
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   findOnePresentationMember,
   createNewPresentationMember,
@@ -77,4 +96,5 @@ module.exports = {
   findAllByPresentationId,
   addPresentationMember,
   removePresentationMember,
+  findOwner,
 };

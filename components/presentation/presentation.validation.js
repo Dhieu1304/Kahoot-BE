@@ -1,10 +1,12 @@
 const Joi = require('joi');
 const { PRESENTATION_TYPE } = require('../presentation-type/presentation-type.constant');
+const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 
 const listPresentation = {
   query: Joi.object().keys({
-    limit: Joi.number().default(10),
-    page: Joi.number().default(0),
+    type: Joi.string()
+      .required()
+      .valid(...Object.values(GROUP_USER_ROLE)),
   }),
 };
 

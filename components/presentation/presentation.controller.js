@@ -8,13 +8,39 @@ const {
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 const { randomSixNumber } = require('../utils/randomNumber');
 const pick = require('../utils/pick');
+const toJSON = require('../utils/toJSON');
+
+const getOwnerPresentation = async (presentation_id) => {
+  const ownerPresentation = await presentationMemberService.findOwner(presentation_id);
+  return {
+    id: ownerPresentation.user.id,
+    full_name: ownerPresentation.user.full_name,
+    email: ownerPresentation.user.email,
+    avatar: ownerPresentation.user.avatar,
+  };
+};
+
+const getOwnerFromMembers = (members) => {
+  for (let i = 0; i < members.length; i++) {
+    if (members[i]?.role?.name === GROUP_USER_ROLE.OWNER) {
+      return members[i]?.user;
+    }
+  }
+};
 
 const getListPresentation = async (req, res) => {
   const { id } = req.user;
-  const { page, limit } = req.query;
-  const listPresentation = await presentationService.listPresentation(id, limit, page * limit);
-  if (listPresentation) {
-    return res.status(200).json({ status: true, message: 'Successful', data: listPresentation });
+  let { type } = req.query;
+  if (type === GROUP_USER_ROLE.MEMBER) {
+    type = null;
+  }
+  const listPresentation = await presentationService.listPresentation(id, type);
+  const listPresentationRes = toJSON(listPresentation);
+  if (listPresentationRes) {
+    for (let i = 0; i < listPresentationRes.length; i++) {
+      listPresentationRes[i].owner = await getOwnerPresentation(listPresentationRes[i].id);
+    }
+    return res.status(200).json({ status: true, message: 'Successful', data: listPresentationRes });
   }
   return res.status(400).json({ status: false, message: 'Error' });
 };
@@ -64,7 +90,9 @@ const editPresentation = async (req, res) => {
 const getPresentationDetail = async (req, res) => {
   const { id } = req.params;
   const presentationDetail = await presentationService.getDetailPresentation(id);
-  return res.status(200).json({ status: true, message: 'Successful', data: presentationDetail });
+  const presentationRes = toJSON(presentationDetail);
+  presentationRes.owner = getOwnerFromMembers(presentationRes?.presentation_members);
+  return res.status(200).json({ status: true, message: 'Successful', data: presentationRes });
 };
 
 const getAllSlidePresentation = async (req, res) => {

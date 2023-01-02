@@ -21,12 +21,19 @@ const listPresentation = async (user_id, limit, offset) => {
           model: models.presentation_member,
           as: 'presentation_members',
           where: { user_id: user_id },
-          attributes: ['user_id'],
-          include: {
-            model: models.group_user_role,
-            as: 'role',
-            attributes: ['name'],
-          },
+          include: [
+            {
+              model: models.group_user_role,
+              as: 'role',
+              attributes: ['name'],
+            },
+            {
+              model: models.user,
+              as: 'user',
+              attributes: ['id', 'email', 'full_name', 'avatar'],
+            },
+          ],
+          attributes: ['createdAt', 'updatedAt'],
         },
       ],
       // attributes: { exclude: ['createdAt', 'updatedAt'] },

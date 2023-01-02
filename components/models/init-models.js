@@ -17,6 +17,7 @@ const _slide_data = require('../slide-data/slide-data.model');
 const _presentation_theme = require('../presentation-theme/presentation-theme.model');
 const _slide_message = require('../slide-message/slide-message.model');
 const _slide_question = require('../slide-question/slide-question.model');
+const _presentation_group = require('../presentation-group/presentation-group.model');
 
 function initModels(sequelize) {
   const verify_type = _verify_type(sequelize, DataTypes);
@@ -37,6 +38,7 @@ function initModels(sequelize) {
   const slide_data = _slide_data(sequelize, DataTypes);
   const slide_message = _slide_message(sequelize, DataTypes);
   const slide_question = _slide_question(sequelize, DataTypes);
+  const presentation_group = _presentation_group(sequelize, DataTypes);
 
   group.belongsToMany(user, {
     as: 'user_id_users',
@@ -111,6 +113,22 @@ function initModels(sequelize) {
   presentation.hasMany(slide_message, { as: 'slide_messages', foreignKey: 'presentation_id' });
   slide_message.belongsTo(user, { as: 'user', foreignKey: 'user_id' });
   user.hasMany(slide_message, { as: 'slide_messages', foreignKey: 'user_id' });
+  group.belongsToMany(presentation, {
+    as: 'presentation_id_presentations',
+    through: presentation_group,
+    foreignKey: 'group_id',
+    otherKey: 'presentation_id',
+  });
+  presentation.belongsToMany(group, {
+    as: 'group_id_group_presentation_groups',
+    through: presentation_group,
+    foreignKey: 'presentation_id',
+    otherKey: 'group_id',
+  });
+  presentation_group.belongsTo(group, { as: 'group', foreignKey: 'group_id' });
+  group.hasMany(presentation_group, { as: 'presentation_groups', foreignKey: 'group_id' });
+  presentation_group.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
+  presentation.hasMany(presentation_group, { as: 'presentation_groups', foreignKey: 'presentation_id' });
 
   return {
     group,
@@ -131,6 +149,7 @@ function initModels(sequelize) {
     presentation_theme,
     slide_message,
     slide_question,
+    presentation_group,
   };
 }
 

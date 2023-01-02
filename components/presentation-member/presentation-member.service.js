@@ -32,8 +32,49 @@ const checkCanEdit = async (user_id, presentation_id) => {
   }
 };
 
+const findAllByPresentationId = async (presentation_id) => {
+  try {
+    return await models.presentation_member.findAll({
+      where: { presentation_id },
+      include: [
+        {
+          model: models.user,
+          as: 'user',
+          attributes: ['id', 'email', 'full_name', 'avatar'],
+        },
+        {
+          model: models.group_user_role,
+          as: 'role',
+          attributes: ['name'],
+        },
+      ],
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
+const addPresentationMember = async (presentation_id, user_id) => {
+  try {
+    return await models.presentation_member.create({ presentation_id, user_id, role_id: 2 });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
+const removePresentationMember = async (presentation_id, user_id) => {
+  try {
+    return await models.presentation_member.destroy({ where: { presentation_id, user_id, role_id: 2 } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   findOnePresentationMember,
   createNewPresentationMember,
   checkCanEdit,
+  findAllByPresentationId,
+  addPresentationMember,
+  removePresentationMember,
 };

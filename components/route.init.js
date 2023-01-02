@@ -6,6 +6,7 @@ const uploadRouter = require('./upload/upload.route');
 const groupUserRouter = require('./group-user/group-user.route');
 const presentationRouter = require('./presentation/presentation.route');
 const slideRouter = require('./slide/slide.route');
+const presentationMemberRouter = require('./presentation-member/presentation-member.route');
 const express = require('express');
 
 module.exports.initRouter = (app) => {
@@ -17,6 +18,7 @@ module.exports.initRouter = (app) => {
   app.use('/group-user', groupUserRouter);
   app.use('/presentation', presentationRouter);
   app.use('/slide', slideRouter);
+  app.use('/presentation-member', presentationMemberRouter);
   app.use(express.Router().get('/'), (req, res) => {
     return res.status(200).send('KAHOOT_API');
   });

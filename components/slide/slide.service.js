@@ -45,9 +45,18 @@ const dataCountSlide = async (presentation_id, ordinal_slide_number) => {
   }
 };
 
+const countSlidePresentation = async (presentation_id) => {
+  try {
+    return await models.slide.count({ where: { presentation_id } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   editMultiSlide,
   getAllSlidePresentation,
   findOneSlide,
   dataCountSlide,
+  countSlidePresentation,
 };

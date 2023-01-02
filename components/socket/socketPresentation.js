@@ -3,9 +3,9 @@ const socketPresentation = (function () {
   function init() {
     const presentations = [];
     return {
-      addPresentation: function (presentation_id, code, ordinal_slide_number, user_id = null, user_name = null) {
+      addPresentation: function (presentation_id, code, ordinal_slide_number, type = 1, user_id = null) {
         const index = presentations.findIndex((presentation) => presentation.presentation_id === presentation_id);
-        if (index === -1) presentations.push({ presentation_id, code, ordinal_slide_number, user_id, user_name });
+        if (index === -1) presentations.push({ presentation_id, code, ordinal_slide_number, type, user_id });
         else {
           presentations[index].ordinal_slide_number = ordinal_slide_number;
         }

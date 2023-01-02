@@ -1,9 +1,16 @@
 const models = require('../models');
-const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 
 const findOneById = async (id) => {
   try {
     return await models.presentation.findOne({ where: { id: id } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
+const findOneByCode = async (code) => {
+  try {
+    return await models.presentation.findOne({ where: { code } });
   } catch (e) {
     console.error(e.message);
   }
@@ -115,6 +122,7 @@ const deletePresentSession = async (presentation_id) => {
 
 module.exports = {
   findOneById,
+  findOneByCode,
   listPresentation,
   createNewPresentation,
   updatePresentation,

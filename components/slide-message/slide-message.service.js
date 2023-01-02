@@ -30,6 +30,7 @@ const findByPresentationId = async (presentation_id, page, limit) => {
       },
       limit,
       offset: page * limit,
+      order: 'id',
     });
   } catch (e) {
     console.error(e.message);

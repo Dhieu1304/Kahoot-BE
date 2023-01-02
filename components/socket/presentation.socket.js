@@ -5,7 +5,9 @@ const {
   slideDataService,
   slideMessageService,
   slideQuestionService,
+  presentationMemberService,
 } = require('../service.init');
+const { socketJwtAuth } = require('../middleware/jwt.auth');
 const users = require('./socketUser').getInstance();
 const presentations = require('./socketPresentation').getInstance();
 
@@ -32,6 +34,17 @@ const presentationSocket = (io, socket) => {
       const code = +data?.code;
       if (!code) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+      }
+      const presentation = await presentationService.findOneByCode(code);
+      if (!presentation) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid code');
+      }
+      if (presentation && presentation?.presentation_type_id === 2) {
+        const checkSocketJWT = await socketJwtAuth(socket);
+        if (!checkSocketJWT) {
+          return socket.emit(SOCKET_EVENT.ERROR, 'Invalid JWT Token');
+        }
+        // todo check user in group
       }
       users.userConnect(socket.id, code);
       socket.join(code.toString());
@@ -65,11 +78,18 @@ const presentationSocket = (io, socket) => {
   socket.on(PRESENTATION_EVENT.PRESENT, async (data) => {
     try {
       console.log('================PRESENT PRESENTATION=================');
-      // Todo, check user present
+      const checkSocketJWT = await socketJwtAuth(socket);
+      if (!checkSocketJWT) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid JWT Token');
+      }
       const presentation_id = +data?.presentation_id;
       const presentation = await presentationService.findOneById(presentation_id);
       if (!presentation) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid presentation');
+      }
+      const checkUserPermission = await presentationMemberService.checkCanEdit(socket.user.id, presentation_id);
+      if (!checkUserPermission) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'You do not have permission');
       }
       const code = +presentation?.code;
       if (!presentation_id || !code) {
@@ -77,23 +97,31 @@ const presentationSocket = (io, socket) => {
       }
       socket.join(presentation_id.toString());
       socket.join(code.toString());
-      let ordinal_slide_number = 0;
+      let ordinal_slide_number;
       const presentSocket = presentations.findCurrentSlideByCode(code);
       let slide;
       if (!presentSocket) {
         ordinal_slide_number = 1;
-        // todo add user is present
-        presentations.addPresentation(presentation_id, code, ordinal_slide_number, 1, '1');
+        presentations.addPresentation(
+          presentation_id,
+          code,
+          ordinal_slide_number,
+          presentation.presentation_type_id,
+          socket.user.id,
+        );
       } else {
         ordinal_slide_number = presentSocket.ordinal_slide_number;
       }
       slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
       if (!presentSocket) {
-        console.log(' >>>>>>>>>>>>>>>>>>> emit to client');
-        console.log(code);
         io.in(code.toString()).emit(PRESENTATION_EVENT.SLIDE, slide);
       }
-      socket.emit(PRESENTATION_EVENT.SLIDE_DETAIL, { ordinal_slide_number, user_id: 1, user_name: '1' });
+      const count_slide = await slideService.countSlidePresentation(presentation_id);
+      socket.emit(PRESENTATION_EVENT.SLIDE_DETAIL, {
+        user_id: presentSocket.user_id || socket.user.id,
+        type: presentation.presentation_type_id,
+        count_slide,
+      });
       // get slide data
       if (slide && slide.slide_type_id === 1) {
         const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
@@ -102,11 +130,9 @@ const presentationSocket = (io, socket) => {
       }
       // message presentation
       const message = await slideMessageService.findByPresentationId(presentation_id, 1, 50);
-      // io.in(code.toString()).emit(CHAT_EVENT.MESSAGE, message);
       socket.emit(CHAT_EVENT.MESSAGE, message);
       // question presentation
       const question = await slideQuestionService.findByPresentationId(presentation_id, 1, 50);
-      // io.in(code.toString()).emit(QUESTION_EVENT.QUESTION, question);
       socket.emit(QUESTION_EVENT.QUESTION, question);
       socket.emit(SOCKET_EVENT.SUCCESS, `Present successful with slide ${ordinal_slide_number}`);
     } catch (e) {
@@ -117,12 +143,18 @@ const presentationSocket = (io, socket) => {
 
   socket.on(PRESENTATION_EVENT.PRESENT_OTHER_SLIDE, async (data) => {
     console.log('================PRESENT OTHER SLIDE=================');
+    const checkSocketJWT = await socketJwtAuth(socket);
+    if (!checkSocketJWT) {
+      return socket.emit(SOCKET_EVENT.ERROR, 'Invalid JWT Token');
+    }
     const presentation_id = +data?.presentation_id;
     const ordinal_slide_number = +data?.ordinal_slide_number;
-    const user_id = +data?.user_id;
-    // todo check user_id have permission
     if (!presentation_id || !ordinal_slide_number) {
       return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+    }
+    const checkUserPermission = await presentationMemberService.checkCanEdit(socket.user.id, presentation_id);
+    if (!checkUserPermission) {
+      return socket.emit(SOCKET_EVENT.ERROR, 'You do not have permission');
     }
     const presentSocket = presentations.findCurrentSlideByPresentationId(presentation_id);
     if (!presentSocket) {
@@ -135,8 +167,8 @@ const presentationSocket = (io, socket) => {
     if (slide && slide.slide_type_id === 1) {
       const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
       convertDataSlide(slide.body, dataCount);
-      socket.emit(PRESENTATION_EVENT.SLIDE_DATA, slide);
     }
+    io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, slide);
     socket.emit(SOCKET_EVENT.SUCCESS, `Change to slide ${ordinal_slide_number}`);
     try {
     } catch (e) {
@@ -145,19 +177,26 @@ const presentationSocket = (io, socket) => {
     }
   });
 
-  socket.on(PRESENTATION_EVENT.STOP_PRESENT, (data) => {
+  socket.on(PRESENTATION_EVENT.STOP_PRESENT, async (data) => {
     try {
       console.log('================STOP PRESENTATION=================');
       const presentation_id = +data?.presentation_id;
-      const user_id = +data?.user_id;
-      if (!presentation_id || !user_id) {
+      if (!presentation_id) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
-      const removePresent = presentations.removePresentation(presentation_id, user_id);
+      const checkSocketJWT = await socketJwtAuth(socket);
+      if (!checkSocketJWT) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid JWT Token');
+      }
+      const presentation = presentations.findCurrentSlideByPresentationId(presentation_id);
+      socket.leave(presentation_id.toString());
+      socket.leave(presentation.code.toString());
+      const removePresent = presentations.removePresentation(presentation_id, socket.user.id);
       if (!removePresent) {
         return socket.emit(SOCKET_EVENT.ERROR, 'You do not have permission');
       }
-      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.SLIDE, 'The host is stop slideshow');
+      io.in(presentation.code.toString()).emit(PRESENTATION_EVENT.SLIDE, 'The host is stop slideshow');
+      io.in(presentation_id.toString()).emit(PRESENTATION_EVENT.STOP_PRESENT, 'The host is stop slideshow');
       console.log('TOTAL SLIDE IS PRESENT: ', presentations.getTotalPresent());
     } catch (e) {
       console.error(e.message);
@@ -176,6 +215,13 @@ const presentationSocket = (io, socket) => {
       const presentation = presentations.findCurrentSlideByCode(code);
       if (!presentation) {
         socket.emit(SOCKET_EVENT.ERROR, 'Invalid presentation');
+      }
+      if (presentation.type === 2) {
+        const checkSocketJWT = await socketJwtAuth(socket);
+        if (!checkSocketJWT) {
+          return socket.emit(SOCKET_EVENT.ERROR, 'Invalid JWT Token');
+        }
+        // todo check user in group
       }
       await slideDataService.createNewSlideData({
         presentation_id: presentation.presentation_id,
@@ -224,7 +270,7 @@ const presentationSocket = (io, socket) => {
       if (!presentation_id || !page || !limit) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
-      const question = await slideQuestionService.findByPresentationId(presentation_id, page, limit); //
+      const question = await slideQuestionService.findByPresentationId(presentation_id, page, limit);
       socket.emit(QUESTION_EVENT.QUESTION, question);
     } catch (e) {
       console.error(e.message);

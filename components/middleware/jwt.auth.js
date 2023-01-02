@@ -20,3 +20,21 @@ module.exports.jwtAuth = async function (req, res, next) {
     });
   }
 };
+
+module.exports.socketJwtAuth = async function (socket) {
+  try {
+    if (!socket.handshake.query || !socket.handshake.query.token) {
+      return false;
+    }
+    console.log(socket.handshake.query.token);
+    const decoded = await authService.verifyToken(socket.handshake.query.token);
+    if (decoded) {
+      socket.user = decoded;
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error(e.message);
+    return false;
+  }
+};

@@ -31,7 +31,7 @@ const getGroupsByUserIds = async ({ user_id, role_id, raw = false }) => {
 
     const groups = await models.group.findAll(options);
 
-    const groupsWithUserInfors = await models.group.findAll({
+    return await models.group.findAll({
       where: {
         id: groups.map((group) => group.id),
       },
@@ -43,6 +43,7 @@ const getGroupsByUserIds = async ({ user_id, role_id, raw = false }) => {
             {
               model: models.user,
               as: 'user',
+              attributes: { exclude: ['password', 'uid', 'refresh_token'] },
             },
             {
               model: models.group_user_role,
@@ -52,8 +53,6 @@ const getGroupsByUserIds = async ({ user_id, role_id, raw = false }) => {
         },
       ],
     });
-
-    return groupsWithUserInfors;
   } catch (e) {
     console.error(e.message);
     return { status: false, message: e.message };
@@ -137,6 +136,14 @@ const sendMailInvite = async (groupId) => {
   }
 };
 
+const deleteGroup = async (id) => {
+  try {
+    return await models.group.destroy({ where: { id } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   getGroupsByUserIds,
   createGroup,
@@ -144,4 +151,5 @@ module.exports = {
   checkOwnedUser,
   findOneById,
   sendMailInvite,
+  deleteGroup,
 };

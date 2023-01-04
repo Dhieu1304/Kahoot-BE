@@ -19,8 +19,15 @@ const inviteUser = {
   }),
 };
 
+const deleteGroup = {
+  params: Joi.object().keys({
+    id: Joi.number().integer().required(),
+  }),
+};
+
 module.exports = {
   joinGroupByLink,
   createInviteLink,
   inviteUser,
+  deleteGroup,
 };

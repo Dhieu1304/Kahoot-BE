@@ -147,6 +147,21 @@ const joinGroupByEmail = async (req, res) => {
   return res.status(400).json({ status: false, message: 'Invalid invite link' });
 };
 
+const deleteGroup = async (req, res) => {
+  const { id } = req.params;
+  console.log(req.user.id);
+  const checkAdminInGroup = await groupUserService.findOneByUserIdAndGroupId(req.user.id, id);
+  if (!checkAdminInGroup || checkAdminInGroup?.group_user_role_id !== 1) {
+    return res.status(400).json({ status: false, message: 'You do not have permission' });
+  }
+  const deleteAllMember = await groupUserService.deleteAllMemberByGroupId(id);
+  const deleteGroup = await groupService.deleteGroup(id);
+  if (deleteAllMember && deleteGroup) {
+    return res.status(200).json({ status: true, message: 'Successful' });
+  }
+  return res.status(400).json({ status: false, message: 'Error' });
+};
+
 module.exports = {
   getGroupsByUserId,
   getGroupsByOwnUserId,
@@ -158,4 +173,5 @@ module.exports = {
   createInviteLink,
   inviteUserByEmail,
   joinGroupByEmail,
+  deleteGroup,
 };

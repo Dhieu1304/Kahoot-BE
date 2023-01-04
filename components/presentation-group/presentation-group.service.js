@@ -2,7 +2,15 @@ const models = require('../models');
 
 const findAllGroupPresentation = async (presentation_id) => {
   try {
-    return await models.presentation_group.findAll({ where: { presentation_id } });
+    return await models.presentation_group.findAll({
+      where: { presentation_id },
+      include: [
+        {
+          model: models.group,
+          as: 'group',
+        },
+      ],
+    });
   } catch (e) {
     console.log(e.message);
   }

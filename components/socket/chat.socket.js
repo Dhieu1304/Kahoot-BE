@@ -3,7 +3,7 @@ const { slideMessageService } = require('../service.init');
 const presentations = require('./socketPresentation').getInstance();
 
 const chatSocket = (io, socket) => {
-  try {
+  /*try {
     socket.on(CHAT_EVENT.MESSAGE, async (data) => {
       const code = +data?.code;
       const message = data?.message;
@@ -28,7 +28,7 @@ const chatSocket = (io, socket) => {
   } catch (e) {
     console.error(e.message);
     socket.emit(SOCKET_EVENT.ERROR, e.message);
-  }
+  }*/
 };
 
 module.exports = chatSocket;

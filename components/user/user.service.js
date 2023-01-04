@@ -12,7 +12,8 @@ const createUser = async (user) => {
 
 const findOneByEmail = async (email) => {
   try {
-    return await models.user.findOne({ where: { email: email } });
+    if (!email) return null;
+    return await models.user.findOne({ where: { email } });
   } catch (e) {
     console.error(e.message);
     return { status: false, message: e.message };

@@ -129,11 +129,11 @@ const presentationSocket = (io, socket) => {
         socket.emit(PRESENTATION_EVENT.SLIDE_DATA, slide);
       }
       // message presentation
-      const message = await slideMessageService.findByPresentationId(presentation_id, 1, 50);
-      socket.emit(CHAT_EVENT.MESSAGE, message);
+      // const message = await slideMessageService.findByPresentationId(presentation_id, 1, 50);
+      // socket.emit(CHAT_EVENT.MESSAGE, message);
       // question presentation
-      const question = await slideQuestionService.findByPresentationId(presentation_id, 1, 50);
-      socket.emit(QUESTION_EVENT.QUESTION, question);
+      // const question = await slideQuestionService.findByPresentationId(presentation_id, 1, 50);
+      // socket.emit(QUESTION_EVENT.QUESTION, question);
       socket.emit(SOCKET_EVENT.SUCCESS, `Present successful with slide ${ordinal_slide_number}`);
     } catch (e) {
       console.error(e.message);
@@ -244,7 +244,7 @@ const presentationSocket = (io, socket) => {
     }
   });
 
-  socket.on(CHAT_EVENT.GET_MESSAGE, async (data) => {
+  /*socket.on(CHAT_EVENT.GET_MESSAGE, async (data) => {
     try {
       console.log('================GET MESSAGE=================');
       const presentation_id = +data?.presentation_id;
@@ -253,8 +253,8 @@ const presentationSocket = (io, socket) => {
       if (!presentation_id || !page || !limit) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
-      const message = await slideMessageService.findByPresentationId(presentation_id, page, limit);
-      socket.emit(CHAT_EVENT.GET_MESSAGE, message);
+      // const message = await slideMessageService.findByPresentationId(presentation_id, page, limit);
+      // socket.emit(CHAT_EVENT.GET_MESSAGE, message);
     } catch (e) {
       console.error(e.message);
       socket.emit(SOCKET_EVENT.ERROR, e.message);
@@ -276,7 +276,7 @@ const presentationSocket = (io, socket) => {
       console.error(e.message);
       socket.emit(SOCKET_EVENT.ERROR, e.message);
     }
-  });
+  });*/
 };
 
 module.exports = presentationSocket;

@@ -1,4 +1,5 @@
 const models = require('../models');
+const { presentationService } = require('../service.init');
 
 const findOneById = async (id) => {
   try {
@@ -120,6 +121,15 @@ const deletePresentSession = async (presentation_id) => {
   }
 };
 
+const getPresentationByCodeOrId = async (presentation_id, code) => {
+  if (presentation_id) {
+    return await findOneById(presentation_id);
+  } else if (code) {
+    return await findOneByCode(code);
+  }
+  return null;
+};
+
 module.exports = {
   findOneById,
   findOneByCode,
@@ -129,4 +139,5 @@ module.exports = {
   getDetailPresentation,
   deletePresentationById,
   deletePresentSession,
+  getPresentationByCodeOrId,
 };

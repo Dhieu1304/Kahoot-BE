@@ -1,5 +1,5 @@
 const models = require('../models');
-const { groupUserRoleService } = require('../service.init');
+const { groupUserRoleService, presentationMemberService } = require('../service.init');
 const { where, Op } = require('sequelize');
 
 const findOnePresentationMember = async (user_id, role_id, presentation_id) => {
@@ -89,6 +89,27 @@ const findOwner = async (presentation_id) => {
   }
 };
 
+const findOneByPresentAndUserId = async (presentation_id, user_id) => {
+  try {
+    return await models.presentation_member.findOne({ where: { presentation_id, user_id } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
+const checkPrivatePresentation = async (presentation_id, presentation_type_id, user_id) => {
+  if (presentation_type_id === 2) {
+    if (user_id) {
+      return { status: false, message: 'This is private present, please login to continue' };
+    }
+    const presentationMember = await findOneByPresentAndUserId(presentation_id, user_id);
+    if (!presentationMember) {
+      return { status: false, message: 'You are not member of this presentation' };
+    }
+  }
+  return { status: true };
+};
+
 module.exports = {
   findOnePresentationMember,
   createNewPresentationMember,
@@ -97,4 +118,6 @@ module.exports = {
   addPresentationMember,
   removePresentationMember,
   findOwner,
+  findOneByPresentAndUserId,
+  checkPrivatePresentation,
 };

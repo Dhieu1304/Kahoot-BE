@@ -1,8 +1,9 @@
 const models = require('../models');
 
-const createNewSlideMessage = async (slideMessageObj) => {
+const createNewSlideMessage = async (presentation_id, message, user_id = null) => {
   try {
-    return await models.slide_message.create(slideMessageObj);
+    console.log(presentation_id, message, user_id);
+    return await models.slide_message.create({ presentation_id, user_id, message });
   } catch (e) {
     console.error(e.message);
     return false;
@@ -11,11 +12,7 @@ const createNewSlideMessage = async (slideMessageObj) => {
 
 const deleteAllPreSession = async (presentation_id) => {
   try {
-    return await models.slide_message.destroy({
-      where: {
-        presentation_id,
-      },
-    });
+    return await models.slide_message.destroy({ where: { presentation_id } });
   } catch (e) {
     console.error(e.message);
     return false;
@@ -29,8 +26,15 @@ const findByPresentationId = async (presentation_id, page, limit) => {
         presentation_id,
       },
       limit,
-      offset: page * limit,
-      order: 'id',
+      offset: (page - 1) * limit,
+      include: [
+        {
+          model: models.user,
+          as: 'user',
+          attributes: [['id', 'user_id'], 'full_name', 'avatar'],
+        },
+      ],
+      order: [['id', 'DESC']],
     });
   } catch (e) {
     console.error(e.message);

@@ -1,4 +1,5 @@
 const toJSON = (items) => {
+  if (!items) return;
   if (items.constructor.name === 'Array') {
     console.log('array');
     for (let i = 0; i < items.length; i++) {

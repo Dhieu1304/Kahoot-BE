@@ -35,8 +35,15 @@ const removeGroupPresentation = async (req, res) => {
   return res.status(400).json({ status: false, message: 'Validation error' });
 };
 
+const listPresentationInGroup = async (req, res) => {
+  const { group_id } = req.query;
+  const data = await presentationService.findAllPresentationInGroup(group_id);
+  return res.status(200).json({ status: true, message: 'Successful', data });
+};
+
 module.exports = {
   listGroupPresentation,
   addGroupPresentation,
   removeGroupPresentation,
+  listPresentationInGroup,
 };

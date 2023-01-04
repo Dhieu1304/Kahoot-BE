@@ -11,6 +11,12 @@ router.get(
   validate(presentationGroupValidation.listGroup),
   presentationGroupController.listGroupPresentation,
 );
+router.get(
+  '/list-in-group',
+  jwtAuth,
+  validate(presentationGroupValidation.listPresentInGroup),
+  presentationGroupController.listPresentationInGroup,
+);
 router.post(
   '/add-group',
   jwtAuth,

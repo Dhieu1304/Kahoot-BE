@@ -13,7 +13,14 @@ const addGroup = {
   }),
 };
 
+const listPresentInGroup = {
+  query: Joi.object().keys({
+    group_id: Joi.number().integer().required(),
+  }),
+};
+
 module.exports = {
   listGroup,
   addGroup,
+  listPresentInGroup,
 };

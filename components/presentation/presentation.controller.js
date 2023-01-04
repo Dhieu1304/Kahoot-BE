@@ -90,6 +90,9 @@ const editPresentation = async (req, res) => {
 const getPresentationDetail = async (req, res) => {
   const { id } = req.params;
   const presentationDetail = await presentationService.getDetailPresentation(id);
+  if (!presentationDetail) {
+    return res.status(400).json({ status: false, message: 'Do not find this presentation' });
+  }
   const presentationRes = toJSON(presentationDetail);
   presentationRes.owner = getOwnerFromMembers(presentationRes?.presentation_members);
   return res.status(200).json({ status: true, message: 'Successful', data: presentationRes });

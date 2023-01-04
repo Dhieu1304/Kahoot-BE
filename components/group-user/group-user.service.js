@@ -36,4 +36,17 @@ const updateUserRoleInGroup = async (user_id, group_id, group_user_role_id) => {
   }
 };
 
-module.exports = { createGroupUser, findOneByUserIdAndGroupId, updateUserRoleInGroup };
+const deleteUserGroup = async (user_id, group_id) => {
+  try {
+    return await models.group_user.destroy({ where: { user_id, group_id } });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
+module.exports = {
+  createGroupUser,
+  findOneByUserIdAndGroupId,
+  updateUserRoleInGroup,
+  deleteUserGroup,
+};

@@ -12,4 +12,11 @@ router.post(
   groupUserController.changeRoleUser,
 );
 
+router.post(
+  '/delete-member-group',
+  jwtAuth,
+  validate(groupUserValidation.deleteMemberGroup),
+  groupUserController.deleteMemberGroup,
+);
+
 module.exports = router;

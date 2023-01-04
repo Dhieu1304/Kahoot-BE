@@ -8,6 +8,14 @@ const changeRoleUser = {
   }),
 };
 
+const deleteMemberGroup = {
+  body: Joi.object().keys({
+    userId: Joi.string().required(),
+    groupId: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   changeRoleUser,
+  deleteMemberGroup,
 };

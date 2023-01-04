@@ -99,7 +99,7 @@ const findOneByPresentAndUserId = async (presentation_id, user_id) => {
 
 const checkPrivatePresentation = async (presentation_id, presentation_type_id, user_id) => {
   if (presentation_type_id === 2) {
-    if (user_id) {
+    if (!user_id) {
       return { status: false, message: 'This is private present, please login to continue' };
     }
     const presentationMember = await findOneByPresentAndUserId(presentation_id, user_id);

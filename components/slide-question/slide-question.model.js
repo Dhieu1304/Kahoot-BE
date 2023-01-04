@@ -31,6 +31,18 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING(10000),
         allowNull: true,
       },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'user',
+          key: 'id',
+        },
+      },
+      uid: {
+        type: DataTypes.UUID,
+        allowNull: true,
+      },
     },
     {
       sequelize,

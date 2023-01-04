@@ -109,6 +109,8 @@ function initModels(sequelize) {
   presentation_theme.hasMany(presentation, { as: 'presentations', foreignKey: 'presentation_theme_id' });
   slide_question.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
   presentation.hasMany(slide_question, { as: 'slide_questions', foreignKey: 'presentation_id' });
+  slide_question.belongsTo(user, { as: 'user', foreignKey: 'user_id' });
+  user.hasMany(slide_question, { as: 'slide_questions', foreignKey: 'user_id' });
   slide_message.belongsTo(presentation, { as: 'presentation', foreignKey: 'presentation_id' });
   presentation.hasMany(slide_message, { as: 'slide_messages', foreignKey: 'presentation_id' });
   slide_message.belongsTo(user, { as: 'user', foreignKey: 'user_id' });

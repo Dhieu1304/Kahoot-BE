@@ -2,11 +2,13 @@ const pick = require('../utils/pick');
 const { presentationService, slideMessageService, userService, presentationMemberService } = require('../service.init');
 const { CHAT_EVENT } = require('../socket/socket.constant');
 const toJSON = require('../utils/toJSON');
+const checkInput = require('../utils/checkInput');
 
 const getListMessage = async (req, res) => {
-  const data = pick(req.query, ['presentation_id', 'code', 'page', 'limit']);
-  if (!data.presentation_id && !data.code) {
-    return res.status(400).json({ status: false, message: 'presentation_id or code is required' });
+  const data = pick(req.query, ['presentation_id', 'code', 'uid', 'page', 'limit']);
+  const validateInput = checkInput(data.presentation_id, data.code, data.uid, req.user?.id);
+  if (!validateInput.status) {
+    return res.status(400).json(validateInput || { status: false, message: 'Input required' });
   }
   const presentation = await presentationService.getPresentationByCodeOrId(data.presentation_id, data.code);
   if (!presentation) {
@@ -38,9 +40,10 @@ const getListMessage = async (req, res) => {
 };
 
 const newMessage = async (req, res) => {
-  const data = pick(req.body, ['presentation_id', 'code', 'message']);
-  if (!data.presentation_id && !data.code) {
-    return res.status(400).json({ status: false, message: 'presentation_id or code is required' });
+  const data = pick(req.body, ['presentation_id', 'code', 'uid', 'message']);
+  const validateInput = checkInput(data.presentation_id, data.code, data.uid, req.user?.id);
+  if (!validateInput.status) {
+    return res.status(400).json(validateInput || { status: false, message: 'Input required' });
   }
   const presentation = await presentationService.getPresentationByCodeOrId(data.presentation_id, data.code);
   if (!presentation) {
@@ -54,7 +57,12 @@ const newMessage = async (req, res) => {
   if (!checkPrivatePresent || !checkPrivatePresent.status) {
     return res.status(400).json(checkPrivatePresent || { status: false, message: 'This is private presentation' });
   }
-  const newMessage = await slideMessageService.createNewSlideMessage(presentation.id, data.message, req.user?.id);
+  const newMessage = await slideMessageService.createNewSlideMessage(
+    presentation.id,
+    data.message,
+    req.user?.id,
+    data.uid,
+  );
   const userInfo = await userService.findOneByEmail(req.user?.email);
   if (newMessage) {
     _io.in(presentation.code.toString()).emit(CHAT_EVENT.NEW_MESSAGE, {

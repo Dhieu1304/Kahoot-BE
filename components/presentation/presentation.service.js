@@ -1,5 +1,4 @@
 const models = require('../models');
-const { presentationService } = require('../service.init');
 
 const findOneById = async (id) => {
   try {

@@ -1,9 +1,9 @@
 const models = require('../models');
 
-const createNewSlideMessage = async (presentation_id, message, user_id = null) => {
+const createNewSlideMessage = async (presentation_id, message, user_id, uid) => {
   try {
-    console.log(presentation_id, message, user_id);
-    return await models.slide_message.create({ presentation_id, user_id, message });
+    console.log(presentation_id, message, user_id, uid);
+    return await models.slide_message.create({ presentation_id, user_id, message, uid });
   } catch (e) {
     console.error(e.message);
     return false;

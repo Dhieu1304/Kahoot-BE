@@ -5,6 +5,7 @@ const newMessage = {
     presentation_id: Joi.number().integer(),
     code: Joi.number().integer(),
     message: Joi.string().required(),
+    uid: Joi.string(),
   }),
 };
 
@@ -14,6 +15,7 @@ const getList = {
     code: Joi.number().integer(),
     page: Joi.number().integer().default(1).min(1),
     limit: Joi.number().integer().default(10),
+    uid: Joi.string(),
   }),
 };
 

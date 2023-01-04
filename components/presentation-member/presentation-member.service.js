@@ -1,5 +1,5 @@
 const models = require('../models');
-const { groupUserRoleService, presentationMemberService } = require('../service.init');
+const { groupUserRoleService } = require('../service.init');
 const { where, Op } = require('sequelize');
 
 const findOnePresentationMember = async (user_id, role_id, presentation_id) => {

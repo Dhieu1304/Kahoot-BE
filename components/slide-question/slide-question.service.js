@@ -69,7 +69,14 @@ const findByPresentationId = async (presentation_id) => {
   try {
     return await models.slide_question.findAll({
       where: { presentation_id },
-      order: ['id'],
+      include: [
+        {
+          model: models.user,
+          as: 'user',
+          attributes: [['id', 'user_id'], 'full_name', 'avatar'],
+        },
+      ],
+      order: [['id', 'DESC']],
     });
   } catch (e) {
     console.error(e.message);

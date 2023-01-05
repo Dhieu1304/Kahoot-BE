@@ -9,6 +9,7 @@ const slideRouter = require('./slide/slide.route');
 const presentationMemberRouter = require('./presentation-member/presentation-member.route');
 const presentationGroupRouter = require('./presentation-group/presentation-group.route');
 const chatRouter = require('./slide-message/slide-message.route');
+const questionRouter = require('./slide-question/slide-question.route');
 
 const express = require('express');
 
@@ -24,6 +25,7 @@ module.exports.initRouter = (app) => {
   app.use('/presentation-member', presentationMemberRouter);
   app.use('/presentation-group', presentationGroupRouter);
   app.use('/chat', chatRouter);
+  app.use('/question', questionRouter);
   app.use(express.Router().get('/'), (req, res) => {
     return res.status(200).send('KAHOOT_API');
   });

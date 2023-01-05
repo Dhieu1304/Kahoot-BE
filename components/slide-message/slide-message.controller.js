@@ -70,6 +70,7 @@ const newMessage = async (req, res) => {
       user_id: req.user?.id,
       full_name: userInfo?.full_name || 'Anonymous',
       avatar: userInfo?.avatar,
+      uid: data.uid,
     });
     return res.status(200).json({ status: true, message: 'Successful' });
   }

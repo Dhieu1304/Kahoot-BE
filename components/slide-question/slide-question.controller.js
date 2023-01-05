@@ -5,7 +5,7 @@ const {
   userService,
   presentationMemberService,
 } = require('../service.init');
-const { CHAT_EVENT, QUESTION_EVENT } = require('../socket/socket.constant');
+const { QUESTION_EVENT } = require('../socket/socket.constant');
 const toJSON = require('../utils/toJSON');
 const checkInput = require('../utils/checkInput');
 
@@ -31,7 +31,16 @@ const getListQuestion = async (req, res) => {
   if (question) {
     const dataQuestion = toJSON(question);
     for (let i = 0; i < dataQuestion.length; i++) {
-      dataQuestion.vote_by = JSON.parse(dataQuestion.vote_by);
+      if (dataQuestion.vote_by) {
+        dataQuestion.vote_by = JSON.parse(dataQuestion.vote_by);
+      }
+      if (!dataQuestion[i].user) {
+        dataQuestion[i].user = {
+          user_id: null,
+          full_name: 'Anonymous',
+          avatar: null,
+        };
+      }
     }
     return res.status(200).json({ status: true, message: 'Successful', data: dataQuestion });
   }
@@ -65,10 +74,11 @@ const newQuestion = async (req, res) => {
   const userInfo = await userService.findOneByEmail(req.user?.email);
   if (newQuestion) {
     _io.in(presentation.code.toString()).emit(QUESTION_EVENT.NEW_QUESTION, {
-      message: data.message,
+      question: data.question,
       user_id: req.user?.id,
       full_name: userInfo?.full_name || 'Anonymous',
       avatar: userInfo?.avatar,
+      uid: data.uid,
     });
     return res.status(200).json({ status: true, message: 'Successful' });
   }

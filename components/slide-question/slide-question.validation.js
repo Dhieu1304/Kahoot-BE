@@ -26,8 +26,16 @@ const voteQuestion = {
   }),
 };
 
+const markAnswer = {
+  body: Joi.object().keys({
+    presentation_id: Joi.number().integer().required(),
+    question_id: Joi.number().integer().required(),
+  }),
+};
+
 module.exports = {
   newQuestion,
   getList,
   voteQuestion,
+  markAnswer,
 };

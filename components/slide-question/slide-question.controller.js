@@ -142,9 +142,31 @@ const downVoteQuestion = async (req, res) => {
   return res.status(400).json({ status: false, message: 'Error' });
 };
 
+const markAnswerQuestion = async (req, res) => {
+  const data = pick(req.body, ['presentation_id', 'question_id']);
+  const presentation = await presentationService.getPresentationByCodeOrId(data.presentation_id, null);
+  if (!presentation) {
+    return res.status(400).json({ status: false, message: 'Presentation invalid' });
+  }
+  const checkAdmin = await presentationMemberService.findOneByPresentAndUserId(presentation.id, req.user.id);
+  if (!checkAdmin || checkAdmin.role_id === 3) {
+    return res.status(400).json({ status: false, message: 'You do not have permission' });
+  }
+  const markAnswer = await slideQuestionService.markAnswer(data.question_id, req.user.id);
+  if (markAnswer) {
+    const question = await getList(presentation.id);
+    if (question) {
+      _io.in(presentation.code.toString()).emit(QUESTION_EVENT.QUESTION, question);
+    }
+    return res.status(200).json({ status: true, message: 'Successful' });
+  }
+  return res.status(400).json({ status: false, message: 'Error' });
+};
+
 module.exports = {
   newQuestion,
   getListQuestion,
   upVoteQuestion,
   downVoteQuestion,
+  markAnswerQuestion,
 };

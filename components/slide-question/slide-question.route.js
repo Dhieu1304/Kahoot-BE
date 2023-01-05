@@ -17,5 +17,11 @@ router.post(
   validate(slideQuestionValidation.voteQuestion),
   slideQuestionController.downVoteQuestion,
 );
+router.post(
+  '/mark-answer',
+  jwtAuth,
+  validate(slideQuestionValidation.markAnswer),
+  slideQuestionController.markAnswerQuestion,
+);
 
 module.exports = router;

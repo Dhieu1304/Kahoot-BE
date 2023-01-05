@@ -81,10 +81,26 @@ const findByPresentationId = async (presentation_id) => {
   }
 };
 
+const markAnswer = async (id) => {
+  try {
+    const question = await models.slide_question.findOne({ where: { id } });
+    if (!question) {
+      return false;
+    }
+    question.is_answer = true;
+    await question.save();
+    return true;
+  } catch (e) {
+    console.error(e.message);
+    return false;
+  }
+};
+
 module.exports = {
   createNewSlideQuestion,
   deleteAllPreSession,
   upVoteQuestion,
   downVoteQuestion,
   findByPresentationId,
+  markAnswer,
 };

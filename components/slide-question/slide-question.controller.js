@@ -1,13 +1,29 @@
 const pick = require('../utils/pick');
-const {
-  presentationService,
-  slideQuestionService,
-  userService,
-  presentationMemberService,
-} = require('../service.init');
+const { presentationService, slideQuestionService, presentationMemberService } = require('../service.init');
 const { QUESTION_EVENT } = require('../socket/socket.constant');
 const toJSON = require('../utils/toJSON');
 const checkInput = require('../utils/checkInput');
+
+const getList = async (presentation_id) => {
+  const question = await slideQuestionService.findByPresentationId(presentation_id);
+  if (question) {
+    const dataQuestion = toJSON(question);
+    for (let i = 0; i < dataQuestion.length; i++) {
+      if (dataQuestion[i].vote_by) {
+        dataQuestion[i].vote_by = JSON.parse(dataQuestion[i].vote_by);
+      }
+      if (!dataQuestion[i].user) {
+        dataQuestion[i].user = {
+          user_id: null,
+          full_name: 'Anonymous',
+          avatar: null,
+        };
+      }
+    }
+    return dataQuestion;
+  }
+  return null;
+};
 
 const getListQuestion = async (req, res) => {
   const data = pick(req.query, ['presentation_id', 'code', 'uid']);
@@ -27,22 +43,9 @@ const getListQuestion = async (req, res) => {
   if (!checkPrivatePresent || !checkPrivatePresent.status) {
     return res.status(400).json(checkPrivatePresent || { status: false, message: 'Error' });
   }
-  const question = await slideQuestionService.findByPresentationId(presentation.id);
+  const question = await getList(presentation.id);
   if (question) {
-    const dataQuestion = toJSON(question);
-    for (let i = 0; i < dataQuestion.length; i++) {
-      if (dataQuestion.vote_by) {
-        dataQuestion.vote_by = JSON.parse(dataQuestion.vote_by);
-      }
-      if (!dataQuestion[i].user) {
-        dataQuestion[i].user = {
-          user_id: null,
-          full_name: 'Anonymous',
-          avatar: null,
-        };
-      }
-    }
-    return res.status(200).json({ status: true, message: 'Successful', data: dataQuestion });
+    return res.status(200).json({ status: true, message: 'Successful', data: question });
   }
   return res.status(400).json({ status: false, message: 'Error' });
 };
@@ -72,14 +75,10 @@ const newQuestion = async (req, res) => {
     data.uid,
   );
   if (newQuestion) {
-    const userInfo = await userService.findOneByEmail(req.user?.email);
-    _io.in(presentation.code.toString()).emit(QUESTION_EVENT.NEW_QUESTION, {
-      question: data.question,
-      user_id: req.user?.id,
-      full_name: userInfo?.full_name || 'Anonymous',
-      avatar: userInfo?.avatar,
-      uid: data.uid,
-    });
+    const question = await getList(presentation.id);
+    if (question) {
+      _io.in(presentation.code.toString()).emit(QUESTION_EVENT.QUESTION, question);
+    }
     return res.status(200).json({ status: true, message: 'Successful' });
   }
   return res.status(400).json({ status: false, message: 'Error' });
@@ -105,14 +104,10 @@ const upVoteQuestion = async (req, res) => {
   }
   const upVoteQuestion = await slideQuestionService.upVoteQuestion(data.question_id, req.user?.id || data.uid);
   if (upVoteQuestion) {
-    /*const userInfo = await userService.findOneByEmail(req.user?.email);
-      _io.in(presentation.code.toString()).emit(QUESTION_EVENT.NEW_QUESTION, {
-      question: data.question,
-      user_id: req.user?.id,
-      full_name: userInfo?.full_name || 'Anonymous',
-      avatar: userInfo?.avatar,
-      uid: data.uid,
-    });*/
+    const question = await getList(presentation.id);
+    if (question) {
+      _io.in(presentation.code.toString()).emit(QUESTION_EVENT.QUESTION, question);
+    }
     return res.status(200).json({ status: true, message: 'Successful' });
   }
   return res.status(400).json({ status: false, message: 'Error' });
@@ -138,14 +133,10 @@ const downVoteQuestion = async (req, res) => {
   }
   const downVoteQuestion = await slideQuestionService.downVoteQuestion(data.question_id, req.user?.id || data.uid);
   if (downVoteQuestion) {
-    /*const userInfo = await userService.findOneByEmail(req.user?.email);
-      _io.in(presentation.code.toString()).emit(QUESTION_EVENT.NEW_QUESTION, {
-      question: data.question,
-      user_id: req.user?.id,
-      full_name: userInfo?.full_name || 'Anonymous',
-      avatar: userInfo?.avatar,
-      uid: data.uid,
-    });*/
+    const question = await getList(presentation.id);
+    if (question) {
+      _io.in(presentation.code.toString()).emit(QUESTION_EVENT.QUESTION, question);
+    }
     return res.status(200).json({ status: true, message: 'Successful' });
   }
   return res.status(400).json({ status: false, message: 'Error' });

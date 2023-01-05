@@ -29,6 +29,7 @@ const QUESTION_EVENT = {
   UP_VOTE: 'UP_VOTE',
   DOWN_VOTE: 'DOWN_VOTE',
   GET_QUESTION: 'GET_QUESTION',
+  NEW_QUESTION: 'NEW_QUESTION',
 };
 
 module.exports = {

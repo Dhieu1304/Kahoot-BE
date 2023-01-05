@@ -1,8 +1,8 @@
 const models = require('../models');
 
-const createNewSlideQuestion = async (slideQuestionObj) => {
+const createNewSlideQuestion = async (presentation_id, question, user_id, uid) => {
   try {
-    return await models.slide_question.create(slideQuestionObj);
+    return await models.slide_question.create({ presentation_id, question, user_id, uid });
   } catch (e) {
     console.error(e.message);
     return false;
@@ -65,14 +65,10 @@ const downVoteQuestion = async (id, user_id) => {
   }
 };
 
-const findByPresentationId = async (presentation_id, page, limit) => {
+const findByPresentationId = async (presentation_id) => {
   try {
     return await models.slide_question.findAll({
-      where: {
-        presentation_id,
-      },
-      limit,
-      offset: page * limit,
+      where: { presentation_id },
       order: ['id'],
     });
   } catch (e) {

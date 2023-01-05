@@ -1,11 +1,16 @@
 const pick = require('../utils/pick');
-const { presentationService, slideMessageService, userService, presentationMemberService } = require('../service.init');
-const { CHAT_EVENT } = require('../socket/socket.constant');
+const {
+  presentationService,
+  slideQuestionService,
+  userService,
+  presentationMemberService,
+} = require('../service.init');
+const { CHAT_EVENT, QUESTION_EVENT } = require('../socket/socket.constant');
 const toJSON = require('../utils/toJSON');
 const checkInput = require('../utils/checkInput');
 
-const getListMessage = async (req, res) => {
-  const data = pick(req.query, ['presentation_id', 'code', 'uid', 'page', 'limit']);
+const getListQuestion = async (req, res) => {
+  const data = pick(req.query, ['presentation_id', 'code', 'uid']);
   const validateInput = checkInput(data.presentation_id, data.code, data.uid, req.user?.id);
   if (!validateInput.status) {
     return res.status(400).json(validateInput || { status: false, message: 'Input required' });
@@ -22,25 +27,19 @@ const getListMessage = async (req, res) => {
   if (!checkPrivatePresent || !checkPrivatePresent.status) {
     return res.status(400).json(checkPrivatePresent || { status: false, message: 'Error' });
   }
-  const messages = await slideMessageService.findByPresentationId(presentation.id, data.page, data.limit);
-  if (messages) {
-    const dataMessage = toJSON(messages);
-    for (let i = 0; i < dataMessage.length; i++) {
-      if (!dataMessage[i].user) {
-        dataMessage[i].user = {
-          user_id: null,
-          full_name: 'Anonymous',
-          avatar: null,
-        };
-      }
+  const question = await slideQuestionService.findByPresentationId(presentation.id);
+  if (question) {
+    const dataQuestion = toJSON(question);
+    for (let i = 0; i < dataQuestion.length; i++) {
+      dataQuestion.vote_by = JSON.parse(dataQuestion.vote_by);
     }
-    return res.status(200).json({ status: true, message: 'Successful', data: dataMessage });
+    return res.status(200).json({ status: true, message: 'Successful', data: dataQuestion });
   }
   return res.status(400).json({ status: false, message: 'Error' });
 };
 
-const newMessage = async (req, res) => {
-  const data = pick(req.body, ['presentation_id', 'code', 'uid', 'message']);
+const newQuestion = async (req, res) => {
+  const data = pick(req.body, ['presentation_id', 'code', 'uid', 'question']);
   const validateInput = checkInput(data.presentation_id, data.code, data.uid, req.user?.id);
   if (!validateInput.status) {
     return res.status(400).json(validateInput || { status: false, message: 'Input required' });
@@ -57,15 +56,15 @@ const newMessage = async (req, res) => {
   if (!checkPrivatePresent || !checkPrivatePresent.status) {
     return res.status(400).json(checkPrivatePresent || { status: false, message: 'Error' });
   }
-  const newMessage = await slideMessageService.createNewSlideMessage(
+  const newQuestion = await slideQuestionService.createNewSlideQuestion(
     presentation.id,
-    data.message,
+    data.question,
     req.user?.id,
     data.uid,
   );
   const userInfo = await userService.findOneByEmail(req.user?.email);
-  if (newMessage) {
-    _io.in(presentation.code.toString()).emit(CHAT_EVENT.NEW_MESSAGE, {
+  if (newQuestion) {
+    _io.in(presentation.code.toString()).emit(QUESTION_EVENT.NEW_QUESTION, {
       message: data.message,
       user_id: req.user?.id,
       full_name: userInfo?.full_name || 'Anonymous',
@@ -77,6 +76,6 @@ const newMessage = async (req, res) => {
 };
 
 module.exports = {
-  newMessage,
-  getListMessage,
+  newQuestion,
+  getListQuestion,
 };

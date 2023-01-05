@@ -43,6 +43,11 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.UUID,
         allowNull: true,
       },
+      is_answer: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
     },
     {
       sequelize,

@@ -21,6 +21,28 @@ module.exports.jwtAuth = async function (req, res, next) {
   }
 };
 
+module.exports.isHasJWT = async function (req, res, next) {
+  const { authorization } = req.headers;
+  try {
+    if (authorization.startsWith('Bearer')) {
+      const token = authorization.split('Bearer ')[1];
+      if (token) {
+        const decoded = await authService.verifyToken(token);
+        if (decoded) {
+          req.user = decoded;
+        }
+      }
+    }
+    next();
+  } catch (e) {
+    console.error(e.message);
+    return res.status(400).json({
+      status: false,
+      message: 'Internal error server',
+    });
+  }
+};
+
 module.exports.socketJwtAuth = async function (socket) {
   try {
     if (!socket.handshake.query || !socket.handshake.query.token) {

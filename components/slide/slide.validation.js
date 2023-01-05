@@ -26,7 +26,15 @@ const deleteSlideData = {
   }),
 };
 
+const getSlideData = {
+  query: Joi.object().keys({
+    presentation_id: Joi.number().integer().required(),
+    ordinal_slide_number: Joi.number().integer().required(),
+  }),
+};
+
 module.exports = {
   updateSlide,
   deleteSlideData,
+  getSlideData,
 };

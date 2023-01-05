@@ -49,5 +49,7 @@ router.post(
   validate(presentationValidation.deleteSession),
   presentationController.deleteSession,
 );
+router.post('/present', jwtAuth, validate(presentationValidation.present), presentationController.present);
+router.post('/client-join', validate(presentationValidation.clientJoin), presentationController.clientJoin);
 
 module.exports = router;

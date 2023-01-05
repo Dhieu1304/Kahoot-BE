@@ -3,32 +3,16 @@ const {
   slideService,
   presentationService,
   slideDataService,
-  slideMessageService,
-  slideQuestionService,
   presentationMemberService,
+  cryptoService,
 } = require('../service.init');
 const { socketJwtAuth } = require('../middleware/jwt.auth');
+const convertDataSlide = require('../utils/convertDataSlide');
 const users = require('./socketUser').getInstance();
 const presentations = require('./socketPresentation').getInstance();
 
-const convertDataSlide = (bodySlide, data) => {
-  if (data && data.length > 0) {
-    for (let i = 0; i < bodySlide.length; i++) {
-      for (let j = 0; j < data.length; j++) {
-        if (bodySlide[i].name === data[j].name) {
-          bodySlide[i].value = data[j].count;
-        }
-      }
-    }
-  } else {
-    for (let i = 0; i < bodySlide.length; i++) {
-      bodySlide[i].value = 0;
-    }
-  }
-};
-
 const presentationSocket = (io, socket) => {
-  socket.on(PRESENTATION_EVENT.JOIN, async (data) => {
+  /*socket.on(PRESENTATION_EVENT.JOIN, async (data) => {
     try {
       console.log('================JOIN PRESENTATION=================');
       const code = +data?.code;
@@ -59,9 +43,9 @@ const presentationSocket = (io, socket) => {
       console.error(e.message);
       socket.emit(SOCKET_EVENT.ERROR, e.message);
     }
-  });
+  });*/
 
-  socket.on(PRESENTATION_EVENT.LEAVE, (data) => {
+  /*socket.on(PRESENTATION_EVENT.LEAVE, (data) => {
     try {
       console.log('================LEAVE PRESENTATION=================');
       const code = +data?.code;
@@ -73,8 +57,9 @@ const presentationSocket = (io, socket) => {
       console.error(e.message);
       socket.emit(SOCKET_EVENT.ERROR, e.message);
     }
-  });
+  });*/
 
+  /*
   socket.on(PRESENTATION_EVENT.PRESENT, async (data) => {
     try {
       console.log('================PRESENT PRESENTATION=================');
@@ -135,6 +120,52 @@ const presentationSocket = (io, socket) => {
       // const question = await slideQuestionService.findByPresentationId(presentation_id, 1, 50);
       // socket.emit(QUESTION_EVENT.QUESTION, question);
       socket.emit(SOCKET_EVENT.SUCCESS, `Present successful with slide ${ordinal_slide_number}`);
+    } catch (e) {
+      console.error(e.message);
+      socket.emit(SOCKET_EVENT.ERROR, e.message);
+    }
+  });
+*/
+
+  socket.on(PRESENTATION_EVENT.JOIN_HOST, async (data) => {
+    try {
+      console.log('================JOIN_HOST=================');
+      const checkSocketJWT = await socketJwtAuth(socket);
+      if (!checkSocketJWT) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid JWT Token');
+      }
+      if (!data.data) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+      }
+      const decrypted = await cryptoService.decryptData(data.data);
+      if (new Date().getTime() > decrypted.date) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Expired');
+      }
+      if (decrypted.user_id !== socket.user.id) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid user');
+      }
+      socket.join(decrypted.presentation_id.toString());
+      socket.join(decrypted.code.toString());
+      socket.emit(SOCKET_EVENT.SUCCESS, `Join Successfully`);
+    } catch (e) {
+      console.error(e.message);
+      socket.emit(SOCKET_EVENT.ERROR, e.message);
+    }
+  });
+
+  socket.on(PRESENTATION_EVENT.JOIN_CLIENT, async (data) => {
+    try {
+      console.log('================JOIN_CLIENT=================');
+      if (!data.data) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+      }
+      const decrypted = await cryptoService.decryptData(data.data);
+      if (new Date().getTime() > decrypted.date) {
+        return socket.emit(SOCKET_EVENT.ERROR, 'Expired');
+      }
+      users.userConnect(socket.id, decrypted.code);
+      socket.join(decrypted.code.toString());
+      socket.emit(SOCKET_EVENT.SUCCESS, `Join Successfully`);
     } catch (e) {
       console.error(e.message);
       socket.emit(SOCKET_EVENT.ERROR, e.message);

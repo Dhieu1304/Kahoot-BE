@@ -40,8 +40,20 @@ const deletePresentation = {
 };
 
 const deleteSession = {
-  param: Joi.object().keys({
+  body: Joi.object().keys({
     presentation_id: Joi.number().integer().required(),
+  }),
+};
+
+const present = {
+  body: Joi.object().keys({
+    presentation_id: Joi.number().integer().required(),
+  }),
+};
+
+const clientJoin = {
+  body: Joi.object().keys({
+    code: Joi.number().integer().required(),
   }),
 };
 
@@ -52,4 +64,6 @@ module.exports = {
   presentationDetail,
   deletePresentation,
   deleteSession,
+  present,
+  clientJoin,
 };

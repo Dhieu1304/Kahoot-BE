@@ -1,4 +1,5 @@
 const { slideService, slideDataService } = require('../service.init');
+const convertDataSlide = require('../utils/convertDataSlide');
 
 const updateSlidePresentation = async (req, res) => {
   let { data, presentation_id } = req.body;
@@ -24,7 +25,18 @@ const deleteSlideData = async (req, res) => {
   return res.status(200).json({ status: true, message: 'Successful' });
 };
 
+const getSlideData = async (req, res) => {
+  const { presentation_id, ordinal_slide_number } = req.query;
+  const slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+  if (slide && slide.slide_type_id === 1) {
+    const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
+    convertDataSlide(slide.body, dataCount);
+  }
+  return res.status(200).json({ status: true, message: 'Successful', data: slide });
+};
+
 module.exports = {
   updateSlidePresentation,
   deleteSlideData,
+  getSlideData,
 };

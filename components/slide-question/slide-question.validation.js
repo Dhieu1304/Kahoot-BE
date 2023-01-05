@@ -17,7 +17,17 @@ const getList = {
   }),
 };
 
+const voteQuestion = {
+  body: Joi.object().keys({
+    presentation_id: Joi.number().integer(),
+    code: Joi.number().integer(),
+    question_id: Joi.number().integer().required(),
+    uid: Joi.string(),
+  }),
+};
+
 module.exports = {
   newQuestion,
   getList,
+  voteQuestion,
 };

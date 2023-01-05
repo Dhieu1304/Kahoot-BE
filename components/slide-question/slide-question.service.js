@@ -26,16 +26,14 @@ const upVoteQuestion = async (id, user_id) => {
   try {
     const question = await models.slide_question.findOne({ where: { id } });
     if (!question) return false;
-    if (user_id) {
-      const userVote = JSON.parse(question.vote_by);
-      if (!userVote.includes(user_id)) {
-        userVote.push(user_id);
-        question.vote_by = JSON.stringify(userVote);
-        question.vote += 1;
-      }
-    } else {
-      question.vote += 1;
+    const userVote = question.vote_by ? JSON.parse(question.vote_by) : [];
+    if (userVote.includes(user_id)) {
+      return false;
     }
+    userVote.push(user_id);
+    console.log(userVote);
+    question.vote_by = JSON.stringify(userVote);
+    question.vote += 1;
     await question.save();
     return question;
   } catch (e) {
@@ -48,15 +46,14 @@ const downVoteQuestion = async (id, user_id) => {
   try {
     const question = await models.slide_question.findOne({ where: { id } });
     if (!question) return false;
-    if (user_id) {
-      const userVote = JSON.parse(question.vote_by);
-      const index = userVote.findIndex((userId) => userId === userId);
-      if (index !== -1) userVote.splice(index, 1);
-      question.vote_by = JSON.stringify(userVote);
-      question.vote -= 1;
-    } else {
-      question.vote -= 1;
+    const userVote = question.vote_by ? JSON.parse(question.vote_by) : [];
+    if (!userVote.includes(user_id)) {
+      return false;
     }
+    const index = userVote.findIndex((userId) => userId === userId);
+    if (index !== -1) userVote.splice(index, 1);
+    question.vote_by = JSON.stringify(userVote);
+    question.vote -= 1;
     await question.save();
     return question;
   } catch (e) {

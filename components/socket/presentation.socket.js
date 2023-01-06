@@ -45,14 +45,20 @@ const presentationSocket = (io, socket) => {
     }
   });*/
 
-  /*socket.on(PRESENTATION_EVENT.LEAVE, (data) => {
+  /*  socket.on(PRESENTATION_EVENT.LEAVE, (data) => {
     try {
       console.log('================LEAVE PRESENTATION=================');
-      const code = +data?.code;
-      if (!code) {
-        return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+      const user = users.findCurrentUserBySocketId(socket.id);
+      if (user) {
+        const presentation = presentations.findCurrentSlideByCode(user?.code);
+        users.userDisconnect(socket.id);
+        io.in(presentation.presentation_id.toString()).emit(PRESENTATION_EVENT.COUNT_ONL, users.countUserInRoom(presentation?.code));
       }
-      socket.leave(code);
+      // const code = +data?.code;
+      // if (!code) {
+      //   return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
+      // }
+      // socket.leave();
     } catch (e) {
       console.error(e.message);
       socket.emit(SOCKET_EVENT.ERROR, e.message);
@@ -146,6 +152,11 @@ const presentationSocket = (io, socket) => {
       }
       socket.join(decrypted.presentation_id.toString());
       socket.join(decrypted.code.toString());
+      users.userConnect(socket.id, null, socket?.user?.id, decrypted.presentation_id);
+      io.in(decrypted.presentation_id.toString()).emit(
+        PRESENTATION_EVENT.COUNT_ONL,
+        users.countUserInRoom(decrypted.code),
+      );
       socket.emit(SOCKET_EVENT.SUCCESS, `Join Successfully`);
     } catch (e) {
       console.error(e.message);
@@ -159,12 +170,17 @@ const presentationSocket = (io, socket) => {
       if (!data.data) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
+      const checkSocketJWT = await socketJwtAuth(socket);
       const decrypted = await cryptoService.decryptData(data.data);
       if (new Date().getTime() > decrypted.date) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Expired');
       }
-      users.userConnect(socket.id, decrypted.code);
+      users.userConnect(socket.id, decrypted.code, socket?.user?.id);
       socket.join(decrypted.code.toString());
+      io.in(decrypted.presentation_id.toString()).emit(
+        PRESENTATION_EVENT.COUNT_ONL,
+        users.countUserInRoom(decrypted.code),
+      );
       socket.emit(SOCKET_EVENT.SUCCESS, `Join Successfully`);
     } catch (e) {
       console.error(e.message);
@@ -234,7 +250,7 @@ const presentationSocket = (io, socket) => {
       socket.emit(SOCKET_EVENT.ERROR, e.message);
     }
   });
-
+  /*
   socket.on(PRESENTATION_EVENT.SUBMIT_ANSWER, async (data) => {
     try {
       console.log('================SUBMIT ANSWER=================');
@@ -274,6 +290,7 @@ const presentationSocket = (io, socket) => {
       socket.emit(SOCKET_EVENT.ERROR, e.message);
     }
   });
+*/
 
   /*socket.on(CHAT_EVENT.GET_MESSAGE, async (data) => {
     try {

@@ -48,6 +48,7 @@ module.exports.socketJwtAuth = async function (socket) {
     if (!socket.handshake.query || !socket.handshake.query.token) {
       return false;
     }
+    console.log('Socket Token: ', socket.handshake.query.token);
     const decoded = await authService.verifyToken(socket.handshake.query.token);
     if (decoded) {
       socket.user = decoded;

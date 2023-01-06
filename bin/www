@@ -26,7 +26,9 @@ const io = new Server(server, { cors: { origin: '*'} });
 const presentationSocket = require("../components/socket/presentation.socket");
 const chatSocket = require("../components/socket/chat.socket");
 const questionSocket = require("../components/socket/question.socket");
+const {PRESENTATION_EVENT, SOCKET_EVENT} = require("../components/socket/socket.constant");
 const users = require('../components/socket/socketUser').getInstance();
+const presentations = require('../components/socket/socketPresentation').getInstance();
 
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -34,8 +36,24 @@ io.on('connection', (socket) => {
   chatSocket(io, socket);
   questionSocket(io, socket);
   socket.on('disconnect', () => {
+    const user = users.findCurrentUserBySocketId(socket.id);
+    if (user) {
+      const presentation = presentations.findCurrentSlideByPresentationId(user?.presentation_id);
+      users.userDisconnect(socket.id);
+      if (presentation) {
+        io.in(presentation.presentation_id.toString()).emit(PRESENTATION_EVENT.COUNT_ONL, users.countUserInRoom(presentation?.code));
+        if (presentation?.user_id === user.user_id) {
+          console.log("================ STOP_PRESENT ========================");
+          const removePresent = presentations.removePresentation(presentation.presentation_id, presentation.user_id);
+          if (!removePresent) {
+            return socket.emit(SOCKET_EVENT.ERROR, 'You do not have permission');
+          }
+          io.in(presentation.code.toString()).emit(PRESENTATION_EVENT.SLIDE, 'The host is stop slideshow');
+          io.in(presentation.presentation_id.toString()).emit(PRESENTATION_EVENT.STOP_PRESENT, 'The host is stop slideshow');
+        }
+      }
+    }
     console.log('user disconnected');
-    users.userDisconnect(socket.id);
   });
 });
 

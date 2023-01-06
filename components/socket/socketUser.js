@@ -3,8 +3,8 @@ const socketUser = (function () {
   function init() {
     const currentUsers = [];
     return {
-      userConnect: function (id, code) {
-        currentUsers.push({ id, code });
+      userConnect: function (id, code, user_id, presentation_id = null) {
+        currentUsers.push({ id, code, user_id, presentation_id });
       },
       getCurrentUser: function () {
         return currentUsers;
@@ -12,7 +12,7 @@ const socketUser = (function () {
       countUserInRoom: function (code) {
         let result = 0;
         for (let i = 0; i < currentUsers.length; i++) {
-          if (currentUsers.code === code) {
+          if (currentUsers[i].code === code) {
             result++;
           }
         }

@@ -5,6 +5,7 @@ const {
   presentationMemberService,
   slideService,
   cryptoService,
+  slideDataService,
 } = require('../service.init');
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 const { randomSixNumber } = require('../utils/randomNumber');
@@ -163,6 +164,10 @@ const present = async (req, res) => {
       id,
     );
     slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+    if (slide && slide.slide_type_id === 1) {
+      slide = toJSON(slide);
+      slide.submitBy = await slideDataService.getSlideDataUsers(presentation_id, ordinal_slide_number);
+    }
     _io.in(presentation.code.toString()).emit(PRESENTATION_EVENT.SLIDE, slide);
   } else {
     ordinal_slide_number = presentSocket.ordinal_slide_number;
@@ -204,8 +209,10 @@ const presentOtherSlide = async (req, res) => {
     return res.status(400).json({ status: false, message: `Please present this slide` });
   }
   presentations.addPresentation(presentation_id, presentSocket.code, ordinal_slide_number);
-  const slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+  let slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
   if (slide && slide.slide_type_id === 1) {
+    slide = toJSON(slide);
+    slide.submitBy = await slideDataService.getSlideDataUsers(presentation_id, ordinal_slide_number);
     const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
     convertDataSlide(slide.body, dataCount);
   }
@@ -233,6 +240,10 @@ const clientJoin = async (req, res) => {
   let slide;
   if (presentSocket) {
     slide = await slideService.findOneSlide(presentation.id, presentSocket.ordinal_slide_number);
+  }
+  if (slide && slide.slide_type_id === 1) {
+    slide = toJSON(slide);
+    slide.submitBy = await slideDataService.getSlideDataUsers(presentation.id, presentSocket.ordinal_slide_number);
   }
   _io.in(presentation.id.toString()).emit(PRESENTATION_EVENT.COUNT_ONL, users.countUserInRoom(code));
   const encrypted = await cryptoService.encryptData({

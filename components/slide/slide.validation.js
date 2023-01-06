@@ -39,9 +39,18 @@ const getSlideClient = {
   }),
 };
 
+const submitAnswer = {
+  body: Joi.object().keys({
+    code: Joi.number().integer().required(),
+    name: Joi.string().required(),
+    uid: Joi.string(),
+  }),
+};
+
 module.exports = {
   updateSlide,
   deleteSlideData,
   getSlideData,
   getSlideClient,
+  submitAnswer,
 };

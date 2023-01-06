@@ -188,6 +188,32 @@ const present = async (req, res) => {
   return res.status(200).json({ status: true, message: 'Successful', data });
 };
 
+const presentOtherSlide = async (req, res) => {
+  const { id } = req.user;
+  const { presentation_id, ordinal_slide_number } = req.body;
+  const presentation = await presentationService.findOneById(presentation_id);
+  if (!presentation) {
+    return res.status(400).json({ status: false, message: 'Invalid presentation' });
+  }
+  const presentationMember = await presentationMemberService.findOneByPresentAndUserId(id, presentation_id);
+  if (!presentationMember || presentationMember.role_id === 3) {
+    return res.status(400).json({ status: false, message: 'You do not have permission to present' });
+  }
+  const presentSocket = presentations.findCurrentSlideByCode(presentation.code);
+  if (!presentSocket) {
+    return res.status(400).json({ status: false, message: `Please present this slide` });
+  }
+  presentations.addPresentation(presentation_id, presentSocket.code, ordinal_slide_number);
+  const slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+  if (slide && slide.slide_type_id === 1) {
+    const dataCount = await slideService.dataCountSlide(presentation_id, ordinal_slide_number);
+    convertDataSlide(slide.body, dataCount);
+  }
+  _io.in(presentation.code.toString()).emit(PRESENTATION_EVENT.SLIDE, slide);
+  _io.in(presentation.id.toString()).emit(PRESENTATION_EVENT.SLIDE_DATA, slide);
+  return res.status(200).json({ status: true, message: `Change to slide ${ordinal_slide_number}` });
+};
+
 const clientJoin = async (req, res) => {
   const { code } = req.body;
   const presentation = await presentationService.findOneByCode(code);
@@ -198,16 +224,14 @@ const clientJoin = async (req, res) => {
     if (!req.user) {
       return res.status(400).json({ status: false, message: 'This is private present, please login to continue' });
     }
-  }
-  const presentationMember = await presentationMemberService.findOnePresentationMember(req.user?.id, presentation.id);
-  if (!presentationMember) {
-    return res.status(400).json({ status: false, message: 'You do not have permission to join' });
+    const presentationMember = await presentationMemberService.findOnePresentationMember(req.user?.id, presentation.id);
+    if (!presentationMember) {
+      return res.status(400).json({ status: false, message: 'You do not have permission to join' });
+    }
   }
   const presentSocket = presentations.findCurrentSlideByCode(presentation.code);
   let slide;
-  if (!presentSocket) {
-    slide = { message: 'Please wait the host present this slide' };
-  } else {
+  if (presentSocket) {
     slide = await slideService.findOneSlide(presentation.id, presentSocket.ordinal_slide_number);
   }
   _io.in(presentation.id.toString()).emit(PRESENTATION_EVENT.COUNT_ONL, users.countUserInRoom(code));
@@ -218,7 +242,7 @@ const clientJoin = async (req, res) => {
   });
   const data = {
     slide,
-    join_host: encrypted,
+    join_client: encrypted,
   };
   return res.status(200).json({ status: true, message: 'Successful', data });
 };
@@ -233,4 +257,5 @@ module.exports = {
   deleteSession,
   present,
   clientJoin,
+  presentOtherSlide,
 };

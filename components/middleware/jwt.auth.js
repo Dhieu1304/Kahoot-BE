@@ -24,7 +24,7 @@ module.exports.jwtAuth = async function (req, res, next) {
 module.exports.isHasJWT = async function (req, res, next) {
   const { authorization } = req.headers;
   try {
-    if (authorization.startsWith('Bearer')) {
+    if (authorization && authorization.startsWith('Bearer')) {
       const token = authorization.split('Bearer ')[1];
       if (token) {
         const decoded = await authService.verifyToken(token);
@@ -48,7 +48,6 @@ module.exports.socketJwtAuth = async function (socket) {
     if (!socket.handshake.query || !socket.handshake.query.token) {
       return false;
     }
-    console.log(socket.handshake.query.token);
     const decoded = await authService.verifyToken(socket.handshake.query.token);
     if (decoded) {
       socket.user = decoded;

@@ -172,7 +172,7 @@ const presentationSocket = (io, socket) => {
     }
   });
 
-  socket.on(PRESENTATION_EVENT.PRESENT_OTHER_SLIDE, async (data) => {
+  /*socket.on(PRESENTATION_EVENT.PRESENT_OTHER_SLIDE, async (data) => {
     console.log('================PRESENT OTHER SLIDE=================');
     const checkSocketJWT = await socketJwtAuth(socket);
     if (!checkSocketJWT) {
@@ -206,7 +206,7 @@ const presentationSocket = (io, socket) => {
       console.error(e.message);
       socket.emit(SOCKET_EVENT.ERROR, e.message);
     }
-  });
+  });*/
 
   socket.on(PRESENTATION_EVENT.STOP_PRESENT, async (data) => {
     try {

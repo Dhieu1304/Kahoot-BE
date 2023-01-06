@@ -50,6 +50,12 @@ router.post(
   presentationController.deleteSession,
 );
 router.post('/present', jwtAuth, validate(presentationValidation.present), presentationController.present);
+router.post(
+  '/present-other-slide',
+  jwtAuth,
+  validate(presentationValidation.presentOtherSlide),
+  presentationController.presentOtherSlide,
+);
 router.post('/client-join', validate(presentationValidation.clientJoin), presentationController.clientJoin);
 
 module.exports = router;

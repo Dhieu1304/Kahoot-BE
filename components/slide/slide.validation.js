@@ -33,8 +33,15 @@ const getSlideData = {
   }),
 };
 
+const getSlideClient = {
+  query: Joi.object().keys({
+    code: Joi.number().integer().required(),
+  }),
+};
+
 module.exports = {
   updateSlide,
   deleteSlideData,
   getSlideData,
+  getSlideClient,
 };

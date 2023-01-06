@@ -51,6 +51,13 @@ const present = {
   }),
 };
 
+const presentOtherSlide = {
+  body: Joi.object().keys({
+    presentation_id: Joi.number().integer().required(),
+    ordinal_slide_number: Joi.number().integer().required(),
+  }),
+};
+
 const clientJoin = {
   body: Joi.object().keys({
     code: Joi.number().integer().required(),
@@ -66,4 +73,5 @@ module.exports = {
   deleteSession,
   present,
   clientJoin,
+  presentOtherSlide,
 };

@@ -9,5 +9,6 @@ router.get('/type', slideParentTypeController.getAllType);
 router.put('/update', validate(slideValidation.updateSlide), slideController.updateSlidePresentation);
 router.post('/delete-data', validate(slideValidation.deleteSlideData), slideController.deleteSlideData);
 router.get('/get-slide-data', validate(slideValidation.getSlideData), slideController.getSlideData);
+// router.get('/get-slide', validate(slideValidation.getSlideClient), slideController.getSlideClient);
 
 module.exports = router;

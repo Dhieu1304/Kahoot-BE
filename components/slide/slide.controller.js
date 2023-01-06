@@ -1,5 +1,6 @@
 const { slideService, slideDataService } = require('../service.init');
 const convertDataSlide = require('../utils/convertDataSlide');
+const presentations = require('../socket/socketPresentation').getInstance();
 
 const updateSlidePresentation = async (req, res) => {
   let { data, presentation_id } = req.body;
@@ -35,8 +36,23 @@ const getSlideData = async (req, res) => {
   return res.status(200).json({ status: true, message: 'Successful', data: slide });
 };
 
+/*
+const getSlideClient = async (req, res) => {
+  const { code } = req.query;
+  const presentSocket = presentations.findCurrentSlideByCode(code);
+  let slide = 'Please wait the host present slide';
+  if (presentSocket) {
+    slide = await slideService.findOneSlide(presentSocket.presentation_id, presentSocket.ordinal_slide_number);
+  }
+  const data = {
+    slide,
+  }
+  return res.status(200).json({ status: true, message: 'Successful', data });
+};*/
+
 module.exports = {
   updateSlidePresentation,
   deleteSlideData,
   getSlideData,
+  // getSlideClient,
 };

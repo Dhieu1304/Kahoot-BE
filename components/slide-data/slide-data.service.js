@@ -58,10 +58,29 @@ const getSlideDataUsers = async (presentation_id, ordinal_slide_number) => {
   return result;
 };
 
+const getPresentationData = async (presentation_id) => {
+  try {
+    return await models.slide_data.findAll({
+      where: { presentation_id },
+      include: [
+        {
+          model: models.user,
+          as: 'user',
+          attributes: [['id', 'user_id'], 'full_name', 'avatar'],
+        },
+      ],
+      attributes: { exclude: ['value', 'user_id', 'uid'] },
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 module.exports = {
   createNewSlideData,
   deleteAllExceptInput,
   deleteAllDataOfPresent,
   getSlideData,
   getSlideDataUsers,
+  getPresentationData,
 };

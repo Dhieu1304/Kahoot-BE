@@ -264,6 +264,33 @@ const clientJoin = async (req, res) => {
   return res.status(200).json({ status: true, message: 'Successful', data });
 };
 
+const getData = async (req, res) => {
+  const { presentation_id } = req.body;
+  const presentation = await presentationService.findOneById(presentation_id);
+  if (!presentation) {
+    return res.status(200).json({ status: false, message: 'Invalid presentation' });
+  }
+  const presentationMember = await presentationMemberService.findOneByPresentAndUserId(req.user.id, presentation_id);
+  if (!presentationMember || presentationMember.role_id === 3) {
+    return res.status(400).json({ status: false, message: 'You do not have permission to view detail' });
+  }
+  const presentationData = await slideDataService.getPresentationData(presentation_id);
+  if (presentationData) {
+    const data = toJSON(presentationData);
+    for (let i = 0; i < data.length; i++) {
+      if (!data[i].user) {
+        data[i].user = {
+          user_id: null,
+          full_name: 'Anonymous',
+          avatar: null,
+        };
+      }
+    }
+    return res.status(200).json({ status: true, message: 'Successful', data });
+  }
+  return res.status(400).json({ status: false, message: 'Error, please try again later' });
+};
+
 module.exports = {
   getListPresentation,
   createNewPresentation,
@@ -275,4 +302,5 @@ module.exports = {
   present,
   clientJoin,
   presentOtherSlide,
+  getData,
 };

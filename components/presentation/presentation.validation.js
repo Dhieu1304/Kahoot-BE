@@ -64,6 +64,12 @@ const clientJoin = {
   }),
 };
 
+const getData = {
+  body: Joi.object().keys({
+    presentation_id: Joi.number().integer().required(),
+  }),
+};
+
 module.exports = {
   listPresentation,
   createPresentation,
@@ -74,4 +80,5 @@ module.exports = {
   present,
   clientJoin,
   presentOtherSlide,
+  getData,
 };

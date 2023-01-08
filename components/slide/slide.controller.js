@@ -41,7 +41,8 @@ const getSlideData = async (req, res) => {
 };
 
 const submitAnswer = async (req, res) => {
-  const { code, name, uid } = req.body;
+  let { code, name, uid } = req.body;
+  if (req.user) uid = null;
   const presentation = presentations.findCurrentSlideByCode(code);
   if (!presentation) {
     return res.status(400).json({ status: false, message: 'This presentation not present' });

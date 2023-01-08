@@ -57,5 +57,6 @@ router.post(
   presentationController.presentOtherSlide,
 );
 router.post('/client-join', isHasJWT, validate(presentationValidation.clientJoin), presentationController.clientJoin);
+router.post('/presentation-data', jwtAuth, validate(presentationValidation.getData), presentationController.getData);
 
 module.exports = router;

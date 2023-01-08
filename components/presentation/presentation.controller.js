@@ -164,6 +164,9 @@ const present = async (req, res) => {
       id,
     );
     slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+    if (!slide) {
+      return res.status(200).json({ status: false, message: 'No slide found' });
+    }
     if (slide && slide.slide_type_id === 1) {
       slide = toJSON(slide);
       slide.submitBy = await slideDataService.getSlideDataUsers(presentation_id, ordinal_slide_number);
@@ -172,6 +175,9 @@ const present = async (req, res) => {
   } else {
     ordinal_slide_number = presentSocket.ordinal_slide_number;
     slide = await slideService.findOneSlide(presentation_id, ordinal_slide_number);
+  }
+  if (!slide) {
+    return res.status(200).json({ status: false, message: 'No slide found' });
   }
   const count_slide = await slideService.countSlidePresentation(presentation_id);
   if (slide && slide.slide_type_id === 1) {

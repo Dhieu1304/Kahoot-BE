@@ -38,8 +38,8 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     const user = users.findCurrentUserBySocketId(socket.id);
     if (user) {
-      const presentation = presentations.findCurrentSlideByPresentationId(user?.presentation_id);
       users.userDisconnect(socket.id);
+      const presentation = presentations.findCurrentSlideByPresentationId(user?.presentation_id);
       if (presentation) {
         io.in(presentation.presentation_id.toString()).emit(PRESENTATION_EVENT.COUNT_ONL, users.countUserInRoom(presentation?.code));
         if (presentation?.user_id === user.user_id) {

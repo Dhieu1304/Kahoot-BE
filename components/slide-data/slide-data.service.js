@@ -1,6 +1,5 @@
 const models = require('../models');
-const { Op, Sequelize } = require('sequelize');
-const { slideDataService } = require('../service.init');
+const { Op } = require('sequelize');
 
 const createNewSlideData = async (slideDataObj) => {
   try {

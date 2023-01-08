@@ -1,13 +1,6 @@
-const { PRESENTATION_EVENT, SOCKET_EVENT, CHAT_EVENT, QUESTION_EVENT } = require('./socket.constant');
-const {
-  slideService,
-  presentationService,
-  slideDataService,
-  presentationMemberService,
-  cryptoService,
-} = require('../service.init');
+const { PRESENTATION_EVENT, SOCKET_EVENT } = require('./socket.constant');
+const { cryptoService } = require('../service.init');
 const { socketJwtAuth } = require('../middleware/jwt.auth');
-const convertDataSlide = require('../utils/convertDataSlide');
 const users = require('./socketUser').getInstance();
 const presentations = require('./socketPresentation').getInstance();
 

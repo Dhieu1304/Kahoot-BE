@@ -145,11 +145,11 @@ const present = async (req, res) => {
   const { presentation_id } = req.body;
   const presentation = await presentationService.findOneById(presentation_id);
   if (!presentation) {
-    return res.status(400).json({ status: false, message: 'Invalid presentation' });
+    return res.status(200).json({ status: false, message: 'Invalid presentation' });
   }
-  const presentationMember = await presentationMemberService.findOneByPresentAndUserId(id, presentation_id);
+  const presentationMember = await presentationMemberService.findOneByPresentAndUserId(presentation_id, id);
   if (!presentationMember || presentationMember.role_id === 3) {
-    return res.status(400).json({ status: false, message: 'You do not have permission to present' });
+    return res.status(200).json({ status: false, message: 'You do not have permission to present' });
   }
   const presentSocket = presentations.findCurrentSlideByCode(presentation.code);
   let ordinal_slide_number;
@@ -225,15 +225,15 @@ const clientJoin = async (req, res) => {
   const { code } = req.body;
   const presentation = await presentationService.findOneByCode(code);
   if (!presentation) {
-    return res.status(400).json({ status: false, message: 'Invalid presentation' });
+    return res.status(200).json({ status: false, message: 'Invalid presentation' });
   }
   if (presentation.presentation_type_id === 2) {
     if (!req.user) {
-      return res.status(400).json({ status: false, message: 'This is private present, please login to continue' });
+      return res.status(200).json({ status: false, message: 'This is private present, please login to continue' });
     }
     const presentationMember = await presentationMemberService.findOnePresentationMember(req.user?.id, presentation.id);
     if (!presentationMember) {
-      return res.status(400).json({ status: false, message: 'You do not have permission to join' });
+      return res.status(200).json({ status: false, message: 'You do not have permission to join' });
     }
   }
   const presentSocket = presentations.findCurrentSlideByCode(presentation.code);

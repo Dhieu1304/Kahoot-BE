@@ -41,13 +41,14 @@ const getListMessage = async (req, res) => {
 
 const newMessage = async (req, res) => {
   const data = pick(req.body, ['presentation_id', 'code', 'uid', 'message']);
-  const validateInput = checkInput(data.presentation_id, data.code, data.uid, req.user?.id);
+  if (req.user) delete data.uid;
+  const validateInput = checkInput(data.presentation_id, data.code, data?.uid, req.user?.id);
   if (!validateInput.status) {
     return res.status(400).json(validateInput || { status: false, message: 'Input required' });
   }
   const presentation = await presentationService.getPresentationByCodeOrId(data.presentation_id, data.code);
   if (!presentation) {
-    return res.status(400).json({ status: false, message: 'Presentation invalid' });
+    return res.status(200).json({ status: false, message: 'Presentation invalid' });
   }
   const checkPrivatePresent = await presentationMemberService.checkPrivatePresentation(
     presentation.id,
@@ -55,22 +56,23 @@ const newMessage = async (req, res) => {
     req.user?.id,
   );
   if (!checkPrivatePresent || !checkPrivatePresent.status) {
-    return res.status(400).json(checkPrivatePresent || { status: false, message: 'Error' });
+    return res.status(200).json(checkPrivatePresent || { status: false, message: 'Error' });
   }
   const newMessage = await slideMessageService.createNewSlideMessage(
     presentation.id,
     data.message,
     req.user?.id,
-    data.uid,
+    data?.uid,
   );
   const userInfo = await userService.findOneByEmail(req.user?.email);
   if (newMessage) {
     _io.in(presentation.code.toString()).emit(CHAT_EVENT.NEW_MESSAGE, {
+      id: newMessage.id,
       message: data.message,
       user_id: req.user?.id,
       full_name: userInfo?.full_name || 'Anonymous',
       avatar: userInfo?.avatar,
-      uid: data.uid,
+      uid: data?.uid,
     });
     return res.status(200).json({ status: true, message: 'Successful' });
   }

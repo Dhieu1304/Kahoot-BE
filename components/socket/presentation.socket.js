@@ -146,6 +146,7 @@ const presentationSocket = (io, socket) => {
       socket.join(decrypted.presentation_id.toString());
       socket.join(decrypted.code.toString());
       users.userConnect(socket.id, null, socket?.user?.id, decrypted.presentation_id);
+      users.logUser();
       io.in(decrypted.presentation_id.toString()).emit(
         PRESENTATION_EVENT.COUNT_ONL,
         users.countUserInRoom(decrypted.code),
@@ -169,6 +170,7 @@ const presentationSocket = (io, socket) => {
         return socket.emit(SOCKET_EVENT.ERROR, 'Expired');
       }
       users.userConnect(socket.id, decrypted.code, socket?.user?.id);
+      users.logUser();
       socket.join(decrypted.code.toString());
       io.in(decrypted.presentation_id.toString()).emit(
         PRESENTATION_EVENT.COUNT_ONL,

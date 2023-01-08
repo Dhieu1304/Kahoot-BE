@@ -14,7 +14,7 @@ const getList = {
     presentation_id: Joi.number().integer(),
     code: Joi.number().integer(),
     page: Joi.number().integer().default(1).min(1),
-    limit: Joi.number().integer().default(10),
+    limit: Joi.number().integer().default(20),
     uid: Joi.string(),
   }),
 };

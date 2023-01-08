@@ -4,7 +4,10 @@ const socketUser = (function () {
     const currentUsers = [];
     return {
       userConnect: function (id, code, user_id, presentation_id = null) {
-        currentUsers.push({ id, code, user_id, presentation_id });
+        const index = currentUsers.findIndex((user) => user.id === id);
+        if (index === -1) {
+          currentUsers.push({ id, code, user_id, presentation_id });
+        }
       },
       getCurrentUser: function () {
         return currentUsers;
@@ -25,7 +28,12 @@ const socketUser = (function () {
         }
       },
       findCurrentUserBySocketId: function (id) {
-        return currentUsers.find((user) => user.id === id);
+        const result = currentUsers.find((user) => user.id === id);
+        return Object.assign({}, result);
+      },
+      logUser: function () {
+        console.log('User Length: ', currentUsers.length);
+        console.log(currentUsers);
       },
     };
   }

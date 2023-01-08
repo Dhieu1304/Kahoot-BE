@@ -3,7 +3,7 @@ const router = express.Router();
 const presentationController = require('./presentation.controller');
 const presentationValidation = require('./presentation.validation');
 const validate = require('../middleware/validate');
-const { jwtAuth } = require('../middleware/jwt.auth');
+const { jwtAuth, isHasJWT } = require('../middleware/jwt.auth');
 const presentationThemeController = require('../presentation-theme/presentation-theme.controller');
 
 router.get('/theme', presentationThemeController.listPresentationTheme);
@@ -56,6 +56,6 @@ router.post(
   validate(presentationValidation.presentOtherSlide),
   presentationController.presentOtherSlide,
 );
-router.post('/client-join', validate(presentationValidation.clientJoin), presentationController.clientJoin);
+router.post('/client-join', isHasJWT, validate(presentationValidation.clientJoin), presentationController.clientJoin);
 
 module.exports = router;

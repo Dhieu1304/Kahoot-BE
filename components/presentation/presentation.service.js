@@ -129,6 +129,43 @@ const getPresentationByCodeOrId = async (presentation_id, code) => {
   return null;
 };
 
+const checkUserPresentationGroup = async (id, user_id) => {
+  try {
+    const presentationGroup = await models.presentation.findAll({
+      where: { id },
+      include: [
+        {
+          model: models.presentation_group,
+          as: 'presentation_groups',
+          include: [
+            {
+              model: models.group,
+              as: 'group',
+              include: [
+                {
+                  model: models.group_user,
+                  as: 'group_users',
+                  where: { user_id },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      raw: true,
+    });
+    for (let i = 0; i < presentationGroup.length; i++) {
+      if (presentationGroup[i]['presentation_groups.group.group_users.user_id'] === user_id) {
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    console.error(e.message);
+    return false;
+  }
+};
+
 module.exports = {
   findOneById,
   findOneByCode,
@@ -139,4 +176,5 @@ module.exports = {
   deletePresentationById,
   deletePresentSession,
   getPresentationByCodeOrId,
+  checkUserPresentationGroup,
 };

@@ -1,5 +1,5 @@
 const models = require('../models');
-const { groupUserRoleService } = require('../service.init');
+const { groupUserRoleService, presentationService } = require('../service.init');
 const { where, Op } = require('sequelize');
 
 const findOnePresentationMember = async (user_id, role_id, presentation_id) => {
@@ -103,7 +103,8 @@ const checkPrivatePresentation = async (presentation_id, presentation_type_id, u
       return { status: false, message: 'This is private present, please login to continue' };
     }
     const presentationMember = await findOneByPresentAndUserId(presentation_id, user_id);
-    if (!presentationMember) {
+    const checkUserPresentationGroup = await presentationService.checkUserPresentationGroup(presentation_id, user_id);
+    if (!presentationMember && !checkUserPresentationGroup) {
       return { status: false, message: 'You are not member of this presentation' };
     }
   }

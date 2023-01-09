@@ -237,8 +237,12 @@ const clientJoin = async (req, res) => {
     if (!req.user) {
       return res.status(200).json({ status: false, message: 'This is private present, please login to continue' });
     }
-    const presentationMember = await presentationMemberService.findOnePresentationMember(req.user?.id, presentation.id);
-    if (!presentationMember) {
+    const presentationMember = await presentationMemberService.findOneByPresentAndUserId(presentation.id, req.user?.id);
+    const checkUserPresentationGroup = await presentationService.checkUserPresentationGroup(
+      presentation.id,
+      req.user?.id,
+    );
+    if (!presentationMember && !checkUserPresentationGroup) {
       return res.status(200).json({ status: false, message: 'You do not have permission to join' });
     }
   }

@@ -64,8 +64,7 @@ const findOneByRefreshToken = async (refreshToken) => {
 const getUsersByGroupId = async ({ group_id, raw = false }) => {
   try {
     group_id = parseInt(group_id) || -1;
-
-    const users = await models.user.findAll({
+    return await models.user.findAll({
       raw: raw,
       include: [
         {
@@ -86,9 +85,8 @@ const getUsersByGroupId = async ({ group_id, raw = false }) => {
           as: 'status',
         },
       ],
+      order: ['id'],
     });
-
-    return users;
   } catch (e) {
     console.error(e.message);
     return { status: false, message: e.message };

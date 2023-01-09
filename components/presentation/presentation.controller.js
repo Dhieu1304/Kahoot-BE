@@ -206,7 +206,7 @@ const presentOtherSlide = async (req, res) => {
   if (!presentation) {
     return res.status(400).json({ status: false, message: 'Invalid presentation' });
   }
-  const presentationMember = await presentationMemberService.findOneByPresentAndUserId(id, presentation_id);
+  const presentationMember = await presentationMemberService.findOneByPresentAndUserId(presentation_id, id);
   if (!presentationMember || presentationMember.role_id === 3) {
     return res.status(400).json({ status: false, message: 'You do not have permission to present' });
   }
@@ -270,7 +270,7 @@ const getData = async (req, res) => {
   if (!presentation) {
     return res.status(200).json({ status: false, message: 'Invalid presentation' });
   }
-  const presentationMember = await presentationMemberService.findOneByPresentAndUserId(req.user.id, presentation_id);
+  const presentationMember = await presentationMemberService.findOneByPresentAndUserId(presentation_id, req.user.id);
   if (!presentationMember || presentationMember.role_id === 3) {
     return res.status(400).json({ status: false, message: 'You do not have permission to view detail' });
   }

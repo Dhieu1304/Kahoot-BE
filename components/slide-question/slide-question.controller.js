@@ -151,7 +151,7 @@ const markAnswerQuestion = async (req, res) => {
   if (!presentation) {
     return res.status(200).json({ status: false, message: 'Presentation invalid' });
   }
-  const checkAdmin = await presentationMemberService.findOneByPresentAndUserId(presentation.id, req.user.id);
+  const checkAdmin = await presentationMemberService.findOneByPresentAndUserId(presentation.id, req.user?.id);
   if (!checkAdmin || checkAdmin.role_id === 3) {
     return res.status(200).json({ status: false, message: 'You do not have permission' });
   }

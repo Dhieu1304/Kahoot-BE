@@ -52,8 +52,8 @@ const submitAnswer = async (req, res) => {
       return res.status(400).json({ status: false, message: 'This is private presentation, please login to continue' });
     }
     const presentationMember = await presentationMemberService.findOneByPresentAndUserId(
-      req.user.id,
       presentation.presentation_id,
+      req.user.id,
     );
     if (!presentationMember) {
       return res.status(400).json({ status: false, message: 'You do not have permission' });

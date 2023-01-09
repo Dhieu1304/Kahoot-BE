@@ -10,8 +10,8 @@ const changeRoleUser = {
 
 const deleteMemberGroup = {
   body: Joi.object().keys({
-    userId: Joi.string().required(),
-    groupId: Joi.string().required(),
+    userId: Joi.number().integer().required(),
+    groupId: Joi.number().integer().required(),
   }),
 };
 

@@ -34,7 +34,7 @@ const findByPresentationId = async (presentation_id, page, limit) => {
           attributes: [['id', 'user_id'], 'full_name', 'avatar'],
         },
       ],
-      order: ['id'],
+      order: [['id', 'DESC']],
     });
   } catch (e) {
     console.error(e.message);

@@ -19,3 +19,4 @@ module.exports.slideTypeService = require('./slide-type/slide-type.service');
 module.exports.slideService = require('./slide/slide.service');
 module.exports.slideMessageService = require('./slide-message/slide-message.service');
 module.exports.slideQuestionService = require('./slide-question/slide-question.service');
+module.exports.presentationGroupService = require('./presentation-group/presentation-group.service');

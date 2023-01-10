@@ -20,6 +20,15 @@ const findOneByEmail = async (email) => {
   }
 };
 
+const findOneById = async (id) => {
+  try {
+    return await models.user.findOne({ where: { id }, raw: true });
+  } catch (e) {
+    console.error(e.message);
+    return false;
+  }
+};
+
 const getInfoByEmail = async (email) => {
   try {
     const user = await models.user.findOne({ where: { email: email }, raw: true });
@@ -101,4 +110,5 @@ module.exports = {
   getInfoByEmail,
   findOneByRefreshToken,
   getUsersByGroupId,
+  findOneById,
 };

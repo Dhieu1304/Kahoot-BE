@@ -1,6 +1,14 @@
 const groupService = require('./group.service');
-const { cryptoService, groupUserRoleService, groupUserService, userService, mailService } = require('../service.init');
+const {
+  cryptoService,
+  groupUserRoleService,
+  groupUserService,
+  userService,
+  mailService,
+  presentationGroupService,
+} = require('../service.init');
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
+const presentations = require('../socket/socketPresentation').getInstance();
 
 const getGroupsByUserId = async (req, res) => {
   const user_id_str = req.params.user_id;
@@ -162,6 +170,32 @@ const deleteGroup = async (req, res) => {
   return res.status(400).json({ status: false, message: 'Error' });
 };
 
+const getPresentingByGroupId = async (group_id) => {
+  const presents = presentations.getAllPresent();
+  const data = [];
+  const presentGroup = await presentationGroupService.findAllPresentationInGroup(group_id);
+  const listPresent = [];
+  const listPresentDetail = [];
+  for (let i = 0; i < presentGroup.length; i++) {
+    listPresent.push(presentGroup[i].presentation_id);
+    listPresentDetail.push(presentGroup[i].presentation?.dataValues);
+  }
+  for (let i = 0; i < presents.length; i++) {
+    if (listPresent.includes(presents[i].presentation_id)) {
+      const user = await userService.findOneById(presents[i].user_id);
+      delete user.password;
+      delete user.refresh_token;
+      data.push({ ...presents[i], presentation: listPresentDetail[i], user });
+    }
+  }
+  return data;
+};
+
+const getPresentIsShow = async (req, res) => {
+  const data = await getPresentingByGroupId(req.params.id);
+  return res.status(200).json({ status: true, message: 'Successful', data });
+};
+
 module.exports = {
   getGroupsByUserId,
   getGroupsByOwnUserId,
@@ -174,4 +208,5 @@ module.exports = {
   inviteUserByEmail,
   joinGroupByEmail,
   deleteGroup,
+  getPresentIsShow,
 };

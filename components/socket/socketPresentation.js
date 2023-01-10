@@ -38,6 +38,9 @@ const socketPresentation = (function () {
       getTotalPresent: function () {
         return presentations.length;
       },
+      getAllPresent: function () {
+        return JSON.parse(JSON.stringify(presentations));
+      },
     };
   }
 

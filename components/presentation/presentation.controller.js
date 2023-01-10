@@ -6,6 +6,7 @@ const {
   slideService,
   cryptoService,
   slideDataService,
+  presentationGroupService,
 } = require('../service.init');
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 const { randomSixNumber } = require('../utils/randomNumber');
@@ -196,7 +197,9 @@ const present = async (req, res) => {
     slide,
     join_host: encrypted,
   };
-  return res.status(200).json({ status: true, message: 'Successful', data });
+  res.status(200).json({ status: true, message: 'Successful', data });
+  await presentationGroupService.updatePresentingGroup();
+  console.log(presentations.getAllPresent());
 };
 
 const presentOtherSlide = async (req, res) => {

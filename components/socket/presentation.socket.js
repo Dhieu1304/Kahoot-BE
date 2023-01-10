@@ -54,7 +54,7 @@ const presentationSocket = (io, socket) => {
       if (!data.data) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Invalid Input');
       }
-      const checkSocketJWT = await socketJwtAuth(socket);
+      await socketJwtAuth(socket);
       const decrypted = await cryptoService.decryptData(data.data);
       if (new Date().getTime() > decrypted.date) {
         return socket.emit(SOCKET_EVENT.ERROR, 'Expired');

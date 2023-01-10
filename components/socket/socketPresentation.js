@@ -13,7 +13,7 @@ const socketPresentation = (function () {
       },
       removePresentation: function (presentation_id, user_id) {
         const index = presentations.findIndex(
-          (presentation) => presentation.presentation_id === presentation_id && presentation.user_id === user_id,
+          (presentation) => presentation.presentation_id == presentation_id && presentation.user_id === user_id,
         );
         if (index !== -1) {
           presentations.splice(index, 1);
@@ -22,14 +22,14 @@ const socketPresentation = (function () {
         return false;
       },
       findCurrentSlideByPresentationId: function (presentation_id) {
-        const slide = presentations.find((presentation) => presentation.presentation_id === presentation_id);
+        const slide = presentations.find((presentation) => presentation.presentation_id == presentation_id);
         if (slide) {
           return Object.assign({}, slide);
         }
         return false;
       },
       findCurrentSlideByCode: function (code) {
-        const slide = presentations.find((presentation) => presentation.code === code);
+        const slide = presentations.find((presentation) => presentation.code == code);
         if (slide) {
           return Object.assign({}, slide);
         }

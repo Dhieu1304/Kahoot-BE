@@ -31,7 +31,7 @@ const sendEmail = (receiver, subject, content) => {
   });
 };
 
-const forgotPassword = (fullName, link) => {
+const forgotPassword = (fullName, password) => {
   return `<!DOCTYPE html>
     <html>
     <head>
@@ -75,6 +75,15 @@ const forgotPassword = (fullName, link) => {
         background: #3f479b;
         text-decoration: none;
     }
+	
+	.btn-verify div{
+        font-weight: 600;
+        color: white;
+        margin: 0 auto;
+        padding: 7px;
+        background: #3f479b;
+        text-decoration: none;
+    }
 
         div {
         margin-top: 5px;
@@ -102,15 +111,12 @@ const forgotPassword = (fullName, link) => {
         </div>
         <div>
             <div>
-                There was recently a request to change the password on your account. If you requested this password change,
-                please click the link below to set a new password:
+                There was recently a request to change the password on your account. We send you a new password, please do not share this password with anyone:
             </div>
             <div class="btn-verify">
-                <a href="${link}" target="_blank"> Click here to change your password </a>
+                <div> ${password} </div>
             </div>
-            <div>If the button above is not working, paste this link below into your browser:</div>
-            <div class="link-style">${link}</div>
-            <div>If you don't want to change your password, just ignore this message.</div>
+            <div>After successful login, please change your password for extra security</div>
             <div>
                 Thank you.
             </div>

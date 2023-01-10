@@ -33,3 +33,9 @@ module.exports.refreshToken = {
     refreshToken: Joi.string().required(),
   }),
 };
+
+module.exports.forgotPassword = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+  }),
+};

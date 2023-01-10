@@ -4,6 +4,7 @@ const { roleService, userStatusService, cryptoService, verifyService, mailServic
 const { USER_STATUS } = require('../user-status/user-status.constant');
 const { v4: uuidv4 } = require('uuid');
 const { ROLE } = require('../role/role.constant');
+const { randomString } = require('../utils/random-string');
 
 module.exports.register = async (req, res) => {
   const { email, password, name, avatar } = req.body;
@@ -29,7 +30,7 @@ module.exports.register = async (req, res) => {
   };
   const data = await userService.createUser(user);
   const status = data.status ? 200 : 400 || 500;
-  res.status(status).json(data);
+  res.status(status).json({ status: true, message: 'Register successfully' });
   if (data.status) {
     await authService.sendMailVerify(data.data.id, email, name);
   }
@@ -137,4 +138,18 @@ module.exports.refreshToken = async (req, res) => {
     return res.status(200).json({ status: true, data: { accessToken: token } });
   }
   return res.status(400).json({ status: false, message: 'BAD_REQUEST' });
+};
+
+module.exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await userService.findOneByEmail(email);
+  if (!user) {
+    return res.status(200).json({ status: false, message: 'Do not find user in system' });
+  }
+  const newPass = randomString(10);
+  const content = mailService.forgotPassword(user?.full_name, newPass);
+  const hashPass = await authService.hashPassword(newPass);
+  await userService.updateUserByEmail(email, { password: hashPass });
+  res.status(200).json({ status: true, message: 'Please check your mail to get new password' });
+  await mailService.sendEmail(email, 'Forgot password', content);
 };

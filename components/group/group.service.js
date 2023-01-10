@@ -2,8 +2,43 @@ const sequelize = require('sequelize');
 const models = require('../models');
 const { groupUserService } = require('../service.init');
 
-// user_id is Integer
-// role_id is an integer or an array of integer
+const getGroupById = async ({ id, raw = false }) => {
+  try {
+    const group = await models.group.findOne({
+      where: {
+        id,
+      },
+      raw: raw,
+    });
+
+    return group;
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
+  }
+};
+
+const renameGroupById = async ({ id, name, raw = false }) => {
+  try {
+    const group = await models.group.findOne({
+      where: {
+        id,
+      },
+      raw: raw,
+    });
+
+    const result = await group.update({
+      name,
+    });
+    await group.save();
+
+    return group;
+  } catch (e) {
+    console.error(e.message);
+    return { status: false, message: e.message };
+  }
+};
+
 const getGroupsByUserIds = async ({ user_id, role_id, raw = false }) => {
   try {
     user_id = parseInt(user_id) || -1;
@@ -145,6 +180,8 @@ const deleteGroup = async (id) => {
 };
 
 module.exports = {
+  getGroupById,
+  renameGroupById,
   getGroupsByUserIds,
   createGroup,
   inviteByEmail,

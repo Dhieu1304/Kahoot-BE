@@ -10,6 +10,19 @@ const {
 const { GROUP_USER_ROLE } = require('../group-user-role/group-user-role.constant');
 const presentations = require('../socket/socketPresentation').getInstance();
 
+const getGroupById = async (req, res) => {
+  let id = req.params.id;
+  id = parseInt(id) || -1;
+  const group = await groupService.getGroupById({ id });
+  return res.status(200).json({ status: true, data: group });
+};
+
+const renameGroupById = async (req, res) => {
+  const { id, name } = req.body;
+  const group = await groupService.renameGroupById({ id, name });
+  return res.status(200).json({ status: true, data: group });
+};
+
 const getGroupsByUserId = async (req, res) => {
   const user_id_str = req.params.user_id;
   const user_id = parseInt(user_id_str) || -1;
@@ -197,6 +210,8 @@ const getPresentIsShow = async (req, res) => {
 };
 
 module.exports = {
+  getGroupById,
+  renameGroupById,
   getGroupsByUserId,
   getGroupsByOwnUserId,
   getGroupsByJoinedUserId,
